@@ -1,0 +1,103 @@
+1、浏览器内核
+  ie: trident
+  firefox: presto
+  opreal: gacko
+  safari: webkit
+  chrome: blink
+
+2、BFC 清除浮动
+  block force content 格式化上下文，内部样式不会影响外部：display： absolute；overflow：hidden；float引发
+  清除浮动：&::after{
+    content: '',
+    clear: both
+  }
+
+3、h5新特性
+  语义化标签，是文章结构更清晰，易于维护：header、footer、section、article、asider、nav
+
+4、继承、原型链、this指向、设计模式、call, apply, bind
+  es5：对象冒充+原型链继承 es6： extends
+  原型链： 每一个对象都有一个私有属性：__proto__，它指向他的构造函数的原型对象(prototype),
+    该原型对象又有自己的对象原型指向其构造函数的原型对象，形成的链条脚原型链，终点是null
+  this指向：
+    a): 最终谁调用函数，函数中this就指向谁
+    b): 构造函数中的this：
+      一般指向实例，
+      但是遇到return 时：如果返回的是对象，指向返回的对象，否则指向函数的实例
+      function fn() {  
+        this.user = '追梦子';  
+        return function(){};
+      }
+      var a = new fn;  
+      console.log(a.user); //undefined
+
+      function fn() {  
+        this.user = '追梦子';  
+        return 1;
+      }
+      var a = new fn;  
+      console.log(a.user); //追梦子
+
+    c): 箭头函数指向定义时的上下文，在object中有个例外：
+      var obj = {
+        i: 10,
+        b: () => console.log(this.i, this),
+        c: function() {
+          console.log( this.i, this)
+        }
+      }
+      obj.b();  // undefined window{...}
+      obj.c();  // 10 Object {...}
+
+5、new实现、防抖节流、let, var, const 区别、暂时性死区、event loop
+  1)、new实现：创建一个空对象 --> 将this指向这个空对象 --> 执行构造函数中的代码 --> 返回该对象
+  手写new 代码：
+    function _new(constructor,...args){
+      let instance = {}; // 创建空对象
+      constructor.call(instance,...args); // 将this指向该对象，并执行构造函数
+      return instance // 返回该对象
+    }
+    const person = _new(Person,'小王',13)
+  
+  2)、防抖函数
+    function debounce(func, time) {
+      let timer = null;
+      return function () {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null
+        }
+        timer = setTimeout(func, time * 1000)
+      }
+    }
+
+    节流函数
+    function throttle(fn,delay){
+      let timer = null;
+      return function(){
+        let _this = this;
+        let args = arguments;
+        if(timer){
+          return
+        }
+        timer = setTimeout(()=>{
+          fn.apply(_this,args);
+          timer = null;
+        },delay * 1000)
+      }
+    }
+  4) let const var
+    暂时性死区：代码块内 let命令声明变量之前，变量均是不可用的
+    预编译：发生在函数执行的前一刻
+      创建AO对象 --> 将形参名和变量声明的命作为AO 对象的属性名:undefined --> 将实参和形参相统一 -->在函数体内找函数声明作为AO属性名，值为function
+
+  5) event loop
+    宏任务(macro-task): 包括整体代码、setTimeout setInterval ajax dom操作等等
+    微任务(micro-tast): Promise
+    Promise: 在new Promise()中传入的回调回立即执行,但他的then方法属于微任务
+    process.nextTick: 放在任务栈最尾部,不属于宏任务,为任务,所以总是发生在所有异步任务之前
+    setImmediate: 放在任务栈的最底部,但是setTimeout 优先于setImmediate,但是有可能detImmediate先执行
+
+    同步代码（宏任务） > process.nextTick > Promise（微任务）> setTimeout(fn)、setInterval(fn)（宏任务）> setImmediate（宏任务）> setTimeout(fn, time)、setInterval(fn, time)，其中time>0
+
+
