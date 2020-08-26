@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .border{
+      border: 1px solid red;
+      display: inline-block;
+    }
+    .grandfather{
+      width: 350px;
+      height: 350px;
+    }
+    .father{
+      width: 250px;
+      height: 250px;
+    }
+    .target{
+      width: 200px;
+      height: 200px;
+    }
+    .son{
+      width: 150px;
+      height: 150px;
+    }
+    .grandson{
+      width: 100px;
+      height: 100px;
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="grandfather border">
+    grandfather
+    <ul class="father border">father
+      <li class="target border">target
+        <p class="son border">son
+          <span class="grandson border">grandson</span>
+        </p>
+      </li>
+    </ul>
+  </div>
+  <script>
+
+    const grandfather = document.getElementsByClassName('grandfather')[0];
+    const father = document.getElementsByClassName('father')[0]
+    const target = document.getElementsByClassName('target')[0];
+    const son = document.getElementsByClassName('son')[0]
+    const grandson = document.getElementsByClassName('grandson')[0];
+
+    grandfather.addEventListener('click',(e)=>{
+      console.log(e.target)
+      console.log('grandfather')
+    },true)
+    father.addEventListener('click',()=>{
+      console.log('father')
+    },true)
+    target.addEventListener('click',(e)=>{
+      console.log(e.target)
+      console.log('target')
+    },true)
+
+    son.addEventListener('click',()=>{
+      console.log('son')
+    },true)
+    grandson.addEventListener('click',()=>{
+      console.log('grandson')
+    },true)
+  </script>
+
+
+</body>
+</html>
