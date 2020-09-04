@@ -46,9 +46,33 @@
       document.body.insertBefore(newNode, target.nextSibling);
     } -->
 
-  
-  </script>
+  <button id='btn'>test</button>
+
+
   <script src="./call_apply_bind.js"></script>
+  <script>
+    function debounce(func, time) {
+      let timer = null;
+      return function () {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null
+        }
+        timer = setTimeout(func, time * 1000)
+      }
+    }
+
+    function log() {
+      console.log(1233)
+    }
+
+    const test1 = debounce(log, 0.5)
+    document.getElementById('btn').onclick = function(){
+      console.log(test1)
+      test1()
+    }
+  </script>
+
 </body>
 
 </html>

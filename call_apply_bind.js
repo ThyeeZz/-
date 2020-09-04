@@ -106,20 +106,20 @@ console.log(person)
 person.sing()
 
 // 防抖节流
-function debounce(func, time) {
-  let timer = null;
-  return function () {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null
-    }
-    timer = setTimeout(func, time * 1000)
-  }
-}
+// function debounce(func, time) {
+//   let timer = null;
+//   return function () {
+//     if (timer) {
+//       clearTimeout(timer);
+//       timer = null
+//     }
+//     timer = setTimeout(func, time * 1000)
+//   }
+// }
 
-function log() {
-  console.log(1233)
-}
+// function log() {
+//   console.log(1233)
+// }
 
 // const test1 = debounce(log,0.5)
 
@@ -332,7 +332,180 @@ function deepClone(origin, result) {
   })
   return result
 }
-let bar = deepClone(foo)
-console.log(bar)
-bar.children.push('Alax')
-console.log(bar, foo)
+// let bar = deepClone(foo)
+// console.log(bar)
+// bar.children.push('Alax')
+// console.log(bar, foo)
+
+// 手写promise
+
+function _Promise(func) {
+  this.status = undefined;
+  this.result = null;
+  this.func = func;
+
+  this.then = function (fn) {
+    fn.call(window, this.result)
+  };
+  this.catch = function (fn) {
+    fn.call(window, this.result)
+  }
+}
+
+let p = new _Promise((resolve, reject) => {
+  let flag = true
+  setTimeout(() => {
+    if (flag) {
+      resolve(flag)
+    } else {
+      reject('flag 为false')
+    }
+  }, 2000);
+})
+
+
+
+
+
+
+function getData(flag) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (flag) {
+        resolve(flag)
+      } else {
+        reject('flag 为false')
+      }
+    }, 2000);
+  }).then(res => {
+    console.log('返回值为' + res)
+  }).catch(err => {
+    console.log(err)
+  })
+}
+
+// 手写 forEach 代码
+Array.prototype._forEach = function (callBack, thisArg) {
+  thisArg = thisArg || this;
+  if (typeof callBack !== 'function') {
+    throw new Error(callBack + 'is not a function')
+  }
+
+  const target = Object(this)
+  const len = target.length;
+
+  let index = 0;
+
+  while (index < len) {
+    let val = target[index];
+    callBack.call(thisArg, val, index, target)
+    index++
+  }
+}
+
+// 发布订阅者模式
+function handleOne(a, b, c) {
+  console.log('第一个监听函数', a, b, c)
+}
+
+function handleSecond(a, b, c) {
+  console.log('第二个监听函数', a, b, c)
+}
+
+function handleThird(a, b, c) {
+  console.log('第三个监听函数', a, b, c)
+}
+
+class EventEmitter {
+  constructor() {
+    this.eventList = {}
+    /*
+      {
+        eventName: [fn1,fn2,...]
+      }
+    */
+  }
+  on(eventName, fn) {
+    this.eventList[eventName] = new Set([...this.eventList[eventName] || [], fn])
+    return this
+  }
+
+  emit(eventName, ...args) {
+    console.log(this.eventList)
+    const events = this.eventList[eventName];
+    if (!events.size) {
+      throw new Error('没有处理函数')
+    } else {
+      events.forEach(event => event.call(this, ...args))
+    }
+  }
+
+  offOne(eventName, fn) {
+    const events = this.eventList[eventName];
+    if (events) {
+      const bool = events.delete(fn);
+      return (bool && '删除成功' || '删除失败，未找到此处理函数')
+    }
+  }
+
+  offAll(eventName) {
+    if (eventName) {
+      const events = this.eventList[eventName];
+      events.clear();
+    } else {
+      this.eventList = {};
+    }
+  }
+}
+
+const emitter = new EventEmitter();
+
+// event loop
+
+// async function async1() {
+//   console.log('async1 start');  // 宏任务2
+//   await async2();              
+//   console.log('async1 end');  // ？？
+// }
+// async function async2() {
+//   console.log('async2');  //宏任务3
+// }
+// console.log('script start');// 宏任务1
+// setTimeout(function () {
+//   console.log('setTimeout');  // 微任务 最高层
+// }, 0);
+// async1();
+// new Promise(function (resolve) {
+//   console.log('promise1');   // 宏任务 4
+//   resolve();
+// }).then(function () {
+//   console.log('promise2');  // 微任务1 
+// });
+// process.nextTick(() => {
+//   console.log('nextTick');  //微任务 最底层
+// })
+// console.log('script end'); // 宏任务 5
+
+
+
+setTimeout(()=>{
+  console.log('A');  // 微任务对高层
+},0);
+var obj={
+  func:function () {
+      setTimeout(function () {
+          console.log('B') // 微任务对高层 -1
+      },0);
+      return new Promise(function (resolve) {
+          console.log('C');  // 宏任务1
+          resolve();
+      })
+  }
+};
+obj.func()  // 
+.then(function () {
+  console.log('D')  //微任务 1
+});
+console.log('E');  //宏任务2
+
+// C->E ->D ->A ->B

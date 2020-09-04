@@ -206,3 +206,47 @@
 17、模块加载规范
   a)、CommonJS，使用 require来引入模块，module.exports定义模块输出接口
   b)、es6：import 和 export 来导入导出
+
+18、一道笔试图
+
+    function Foo() {
+      getName = function () {
+        console.log(1);
+      };
+      return this;
+    }
+    Foo.getName = function () {
+      console.log(2);
+    };
+    Foo.prototype.getName = function () {
+      console.log(3);
+    };
+    var getName = function () {
+      console.log(4);
+    };
+
+    function getName() {
+      console.log(5);
+    }
+
+    //请写出以下输出结果：
+    Foo.getName();
+    getName();
+    Foo().getName();
+    getName();
+    new Foo.getName();
+    new Foo().getName();
+    new new Foo().getName();
+
+    a)、Foo.getName()：Foo的getName属性被覆盖了   2
+    b)、getName()：实际为 window.getName();  4
+    c)、Foo().getName()：Foo执行返回的this指向window，并且将window上的getName函数覆盖了； 1
+    d)、new Foo.getName()：实际上是实例化 Foo.getName函数，此时Foo.getName 打印2   2
+    e)、new Foo().getName()：--> (new Foo()).getName() -->foo.getName()，foo上无此属性，所以去原型链上找-->3
+    f)、new new Foo().getName() --> new (new Foo()).getName() -->new foo.getName() --> 实例化foo原型链上的getName函数 -->3
+
+19、auguments
+  非严格模式，不包含剩余参宿，默认参数，解构赋值的，arguments与实参互为映射；否则不追踪参数的值；
+
+20、Object.prototype.hasOwnProperty()
+  返回布尔值，指示对象自身属性中是否有该指定属性
