@@ -250,3 +250,19 @@
 
 20、Object.prototype.hasOwnProperty()
   返回布尔值，指示对象自身属性中是否有该指定属性
+
+21、跨域，JSONP,CORS、CSRF、XSS
+  a)、跨域：协议、域名、端口 相同才能请求资源
+  b)、jSONP：跨域对通过HTML标签发起的资源请求时放行的。利用此规则，通过script标签进行请求，
+      <script src='http://xxx.xx:8080/data?callback=getData></script>
+      表示通过GET 请求某站点资源，请求成功调用getData回调函数；
+      因为scripts标签无法设置requestBody，只能使用 EGT 请求。
+  c)、CORS，每次请求之前先发送一个OPTIONS请求，询问该站点是否允许接下来的跨域，
+  d)、CSRF，利用用户登陆状态，通过第三方站点来进行虚假请求。(跨域产生的原因)
+      防护策略：验证来源站点、使用token
+  e)、XSS：跨站脚本，指黑客在html文件中植入恶意脚本，用户使用时攻击用户的手段。
+      i、储存型xss攻击：评论区提交一份脚本代码，上传到服务器，渲染页面时会被执行；
+        防范：对用户输入信息进行过滤或转码，转码后的脚本在解析过程中无法被执行
+
+      ii、反射型xss攻击：恶意脚本作为网络请求的一部分，随后网站讲脚本返给用户，执行。
+        防范：httpOnly使js无法读取cookie、CSP
