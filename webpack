@@ -1,0 +1,15 @@
+1、Tree shaking
+    tree shaking: 不打包引入但未引用的资源，生产模式，es6Module
+    code split: 多页面应用可以设置多入口，单页面应用：设置optimization，通过es6 Module import语法实现实现代码分离
+    懒加载、预加载：懒加载-》通过异步操作+import 语法；预加载：异步操作+import 语法+prefetch：true
+
+2、Service worker
+    service worker：可以离线查看页面，application可以查看service worker，他将资源缓存下来了
+    多进程打包：thread loader
+    externals：禁止打包一些资源
+
+3、dll
+    dll：单独打包引入资源，创建webpack.dll.js 打包好利用插件引入，以后每次打包都不会在打包这个资源
+
+4、优化环境总结
+    
