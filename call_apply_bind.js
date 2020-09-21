@@ -337,52 +337,6 @@ function deepClone(origin, result) {
 // bar.children.push('Alax')
 // console.log(bar, foo)
 
-// 手写promise
-
-function _Promise(func) {
-  this.status = undefined;
-  this.result = null;
-  this.func = func;
-
-  this.then = function (fn) {
-    fn.call(window, this.result)
-  };
-  this.catch = function (fn) {
-    fn.call(window, this.result)
-  }
-}
-
-let p = new _Promise((resolve, reject) => {
-  let flag = true
-  setTimeout(() => {
-    if (flag) {
-      resolve(flag)
-    } else {
-      reject('flag 为false')
-    }
-  }, 2000);
-})
-
-
-
-
-
-
-function getData(flag) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (flag) {
-        resolve(flag)
-      } else {
-        reject('flag 为false')
-      }
-    }, 2000);
-  }).then(res => {
-    console.log('返回值为' + res)
-  }).catch(err => {
-    console.log(err)
-  })
-}
 
 // 手写 forEach 代码
 Array.prototype._forEach = function (callBack, thisArg) {
@@ -509,3 +463,60 @@ obj.func()  //
 console.log('E');  //宏任务2
 
 // C->E ->D ->A ->B
+
+// 手写promise 函数
+function _Promise(executor) {
+  const self = this;
+  self.status = 'pending';
+  self.value = '';
+  self.reason = '';
+  self.onResolved = []; // 存放成功的回调
+  self.onRejected = []; // 存放失败的回调
+
+  function resolve(value) {
+    self.status = 'fulfilled';
+    self.value = value;
+    self.onResolved.forEach(fn => fn())
+  }
+
+  function reject(reason) {
+    self.status = 'rejected'
+    self.reason = reason;
+    self.onRejected.forEach(fn => fn())
+  }
+
+  executor(resolve,reject)
+}
+
+_Promise.prototype._then = function (onfulfilled, onrejected) {
+  const self = this;
+  console.log(self.status)
+  if(self.status === 'pending'){
+    self.onResolved.push(function(){
+      onfulfilled(self.value)
+    })
+    self.onRejected.push(function(){
+      onrejected(self.reason)
+    })
+  }
+  if (self.status === 'fulfilled') {
+    onfulfilled(self.value)
+  }
+  if (self.status === 'rejected') {
+    onrejected(self.reason)
+  }
+  return self;
+}
+
+
+let p1 = new _Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve('王墉老舔狗了')
+  }, 1000)
+})
+p1._then(res=>{
+  console.log(res)
+})
+._then(res=>{
+  console.log(res + '第二次')
+})

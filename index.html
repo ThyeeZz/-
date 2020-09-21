@@ -16,6 +16,16 @@
       white-space: pre-wrap;
       word-wrap: break-word;
     }
+    #btn{
+      box-sizing: content-box;
+      border: 1px solid red;
+      height: 40px;
+    }
+    #btn:focus{
+      border: 1px solid transparent;
+      outline-color: blue;
+    }
+    
   </style>
 </head>
 
@@ -47,9 +57,10 @@
     } -->
 
   <button id='btn'>test</button>
+  <button id='btn'>test1</button>
 
 
-  <script src="./call_apply_bind.js"></script>
+  <script src="./Proxy.js"></script>
   <script>
     function debounce(func, time) {
       let timer = null;

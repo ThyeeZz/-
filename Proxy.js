@@ -117,7 +117,7 @@
 //     configurable: false
 //   }
 // }
-  
+
 // )
 // let handler = {
 //   get(target, propKey) {
@@ -143,7 +143,7 @@
 
 /**
  * 假定Person对象有一个age属性，该属性应该是一个不大于 200 的整数，那么可以使用Proxy保证age的属性值符合要求。
- * */ 
+ * */
 
 
 // let validator = {
@@ -166,21 +166,87 @@
 // 3、使用proxy 组织访问带‘_'的属性
 
 const handler = {
-  get(target,prop){
-    invariant(prop,'get')
+  get(target, prop) {
+    invariant(prop, 'get')
     return target[prop];
   },
-  set(target,prop,value){
-    invariant(prop,'set')
+  set(target, prop, value) {
+    invariant(prop, 'set')
     target[prop] = value;
   }
 }
-function invariant(key,action){
+
+function invariant(key, action) {
   console.log(key)
-  if(key[0]==='_'){
+  if (key[0] === '_') {
     throw new Error(`无法${action}内部属性${key}`)
   }
 }
 
-let person = new Proxy({},handler)
+let person = new Proxy({}, handler)
 
+
+
+// Object.defineProperty vs proxy
+
+const foo = {
+  name: 'jjl',
+  cars: ['benz', 'audi', 'bmw'],
+  family: {
+    son: 'liergou',
+    grandSon: 'shadiaomi',
+    daughter: {
+      no1: 'saosao',
+      no2: 'saosao2'
+    }
+  }
+}
+
+function deepWatch(foo) {
+  const objStr = "[object Object]";
+  const getObj = Object.prototype.toString;
+  Object.keys(foo).forEach(prop => {
+    let temp = foo[prop]
+    console.log(getObj.call(temp))
+    if (getObj.call(temp) === objStr) {
+      console.log(temp)
+      deepWatch(temp)
+    } else {
+      Object.defineProperty(foo, prop, {
+        get() {
+          console.log('访问' + prop + '属性')
+          return temp
+        },
+        set(val) {
+          console.log('设置' + prop + '属性为' + val)
+          temp = val
+        }
+      })
+    }
+
+  })
+}
+
+
+
+// const proxy = new Proxy(foo, {
+//   get: function (target, prop, receiver) {
+//     console.log('访问' + prop + '属性')
+//     return Reflect.get(target, prop, receiver);
+//   },
+//   set(target, prop, value, receiver) {
+//     console.log('设置' + prop + '属性为' + value)
+//     return Reflect.set(target, prop, value, receiver);
+//   }
+// })
+
+
+let now = +new Date();
+let delay = 3000
+
+while (+new Date - now <delay) {
+
+}
+  
+
+console.log('teste')

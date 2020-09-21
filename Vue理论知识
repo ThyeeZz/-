@@ -1,0 +1,55 @@
+1、响应式系统
+  对data的getter/setter进行拦截，利用发布订阅者模式在getter中进行订阅，在setter中发布通知；
+  watch、computed、render三个角色同为订阅者。watch直接订阅监听的属性；computed和render，如果内部获取了
+  data某个属性，执行getter来订阅该属性，当属性背修改时，执行setter，发布通知；
+
+2、computed和watch的区别
+  computed：更多作为缓存功能的观察者，他可以将一个活多个属性计算生成一个新的属性，当依赖的属性发生变化时不会
+    立即重新计算，二十先做标记，当下次computed被访问时才重新计算并返回
+  watch：不具备缓存，监听某个属性，属性变化时立即执行handler
+
+3、时间绑定原理
+  每一个Vue实例都是一个事件巴士，子组件初始化的时候用$on 将事件注册到内部，需要的时候用$emit触发回调，对于原生
+  事件，需要将event Listener绑定到真是DOM元素上。
+
+4、模板渲染
+  三部：a)、parse阶段：用正则怼template进行解析，转化成抽象语法树AST
+        b)、optimize：遍历AST树，找到静态节点进行标记，方柏霓diff算法跳过，优化性能
+        c)、将AST转换为render函数字符串
+
+5、hash与history
+  hash：原理是 onhanshchange 事件，可以在window对象上监听这个事件
+  history：history api（pushState、replaceState、go、back、forward）
+  hash是一个真实的url，利用锚点#来实现单页面，只要锚点前面内容不变，页面就不会刷新
+  history会导致整个页面重新加载
+
+6、如何重置data
+  Object.assign(this.data,vm.$option.data) 将现在的data属性置为初始data属性
+
+7、style的scoped属性：
+  防止css全局污染，但是很多时候使用ui框架如果加scope就不能覆盖，这个时候一般写sass 会在最外层包裹该组件名的id
+  就可以不使用scoped 了
+
+8、vue中的$event
+  e.target：事件发生的元素
+  e.currentTarget：事件绑定的元素
+
+9、如何匹配404页面
+  {
+    path: *,
+    name: '404'
+    component: Component404
+  }
+  需要将此路由放到路由最后一项
+
+10、使用Vue.observable 实现状态共享
+  Vue.observable(object)让一个对象可响应；
+  创建store.js
+  import Vue from 'vue';
+  
+  export const store = Vue.observable({count: 0});
+  export const mutations = {
+    setCount(count){
+      store.count = count
+    }
+  }

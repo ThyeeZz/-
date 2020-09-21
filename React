@@ -1,0 +1,36 @@
+1、withRouter
+  默认情况下组件的this.props 无法访问到history，也就无法实现js跳转
+  从事可以使用withRouter传入路由参数，this.props就可以访问到 history
+  import React,{Compoent} from 'react';
+  import {widthRouter} from 'react-router-dom';
+
+  class App extends Component{
+    console.log(this.props); // 打印{match:{...},location:{...},history:{...} ...}
+    render(){
+      return (
+        <div className='app'>
+          ...
+        </div>
+      )
+    }
+  }
+
+  export default widthRouter(App)  // 这里执行一下withRouter
+
+2、路由守卫
+  import { Router } from 'react-router-dom';
+
+  function Custom(){
+    return (
+      <Route path='index'
+        Render={()=>{
+          // 做一些逻辑判断来选择渲染，类似Vue的 beforeEach
+          if(isLogin){
+            return <Index />
+          }else{
+            return <Login />
+          }
+        }}
+      />
+    )
+  }
