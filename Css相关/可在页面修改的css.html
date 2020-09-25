@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body style {
+      display: block;
+      padding: 0.6em 0.8em;
+      border: 1px dashed #ccc;
+      background-color: #f5f5f5;
+      color: #000;
+      font-family: Monaco, monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    #btn {
+      box-sizing: content-box;
+      border: 1px solid red;
+      height: 40px;
+    }
+
+    #btn:focus {
+      border: 1px solid transparent;
+      outline-color: blue;
+    }
+  </style>
+</head>
+
+<body>
+  <style contenteditable="true">
+    .main {
+      background: #444;
+      font-size: 2em;
+      border: 1px solid #0f0;
+      border-radius: 3px;
+      color: #46b8da;
+      height: 300px;
+    }
+  </style>
+  <div contenteditable="true"></div>
+
+  <div class="main">拉拉德玛西亚，</div>
+  <div class="main">hello world</div>
+  <div class="main">kill the world</div>
+
+
+
+  <!-- 在第n个元素前插入元素 -->
+  <script>
+    let newNode = document.createElement('div');
+    newNode.innerText = 'this is new node';
+    let target = document.getElementsByClassName('main')[1];
+    if (target.parentNode.lastChild === target) {
+      target.parentElement.appendChild(newNode)
+    } else {
+      document.body.insertBefore(newNode, target.nextSibling);
+    }
+  </script>
+</body>
+
+</html>

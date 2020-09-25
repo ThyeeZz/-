@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>markdown</title>
+
+</head>
+
+<body>
+
+  <div id="app"></div>
+
+  <script>
+    // 监控数据源
+    const bar = {
+      name: '张三',
+      family: {
+        son: ['赵四', '李六', '沙雕宓', '李工'],
+        father: '王五'
+      },
+      cars: [{
+          name: 'bmw',
+          id: 1
+        },
+        {
+          name: 'audi',
+          id: 2
+        }, {
+          name: 'benz',
+          id: 3
+        }
+      ]
+    }
+
+    // 监控组建
+    class Observe {
+      constructor() {
+        this.observers = new Set();
+      }
+      dep() {
+        if (isUpdate) {
+          this.observers.add(isUpdate)
+        }
+      }
+      notify(val) {
+        this.observers.forEach(sub => {
+          sub(val)
+        });
+      }
+    }
+
+    function deepWatch(bar) {
+      const getType = Object.prototype.toString;
+      const objType = "[object Object]";
+
+      Object.keys(bar).forEach(prop => {
+        let temp = bar[prop]
+        if (getType.call(temp) === objType) {
+          deepWatch(temp)
+        } else {
+          Object.defineProperty(bar, prop, {
+            get() {
+              console.log('访问' + prop)
+              observe.dep();
+              return temp
+            },
+            set(val) {
+              console.log('设置' + prop)
+              observe.notify(val)
+              return val
+            }
+          })
+        }
+      })
+    }
+    deepWatch(bar)
+
+    let isUpdate = undefined;
+
+    // 渲染模块
+    const app = document.getElementById("app");
+
+    const render = function () {
+      const {
+        cars
+      } = bar;
+
+      return cars.map(item => {
+        return (
+          `<li key=${item.id}>${item.name}</li>`
+        )
+      })
+    }
+
+    // 通知组件
+    const autoRun = (update) => {
+      function updateWrapper(val) {
+        isUpdate = updateWrapper;
+        update(val)
+        isUpdate = undefined;
+      }
+      updateWrapper()
+    }
+    const observe = new Observe()
+    autoRun(val => {
+      console.log(val)
+      observe.dep();
+      // app.innerText = val
+      app.innerHTML = render()
+    })
+
+
+    // 修改数据
+    Array.prototype._splice = function (index, num, value) {
+      const caller = this;
+      caller.splice(index, num, value);
+      observe.notify(value)
+    }
+    // _$set(Object/Array,propertyName/index,value);
+    const $set = (target, prop, value) => {
+      if (typeof target !== 'object') {
+        throw new Error('目标类型只能是数组或者对象')
+        return
+      }
+      if (target instanceof Array) {
+        Array.prototype._splice.call(target, prop, 0, value);
+      } else {
+        target[prop] = value;
+      }
+    }
+
+    setTimeout(() => {
+      $set(bar, 'name', '张三');
+    }, 1000);
+
+    setTimeout(() => {
+      $set(bar.cars, 0, {
+        name: 'auto',
+        id: 4
+      })
+    }, 3000)
+  </script>
+
+</body>
+
+</html>

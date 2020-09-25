@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jsx中的render函数</title>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <!-- <ul>
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+  </ul> -->
+
+  <script>
+    const data = [{
+        name: 'bmw',
+        id: 1
+      },
+      {
+        name: 'audi',
+        id: 2
+      }, {
+        name: 'benz',
+        id: 3
+      }
+    ];
+
+    createElement(
+      "div", {
+        className: "box"
+      },
+      createElement(
+        "span",
+        null,
+        createElement("em", null, "title")),
+      createElement("div", null, "1111")
+    )
+
+    function createElement(tag, data = {}, ...children) {
+      const _tag = document.createElement(tag);
+      for (let prop in data) {
+        if (data.hasOwnProperty(prop)) {
+          if (prop === 'className') {
+            _tag.setAttribute('class', data[prop])
+          }
+          if (prop === 'text') {
+            _tag.innerText =  data[prop]
+          } else {
+            _tag.setAttribute(prop, data[prop])
+          }
+
+        }
+      }
+      return _tag
+    }
+
+    const _app = document.getElementById("app");
+    app.appendChild(createElement(
+      "div", {
+        className: "box",
+        text: '王墉老舔狗了'
+      },
+      createElement(
+        "span",
+        null,
+        createElement("em", null, "title")),
+      createElement("div", null, "1111")
+    ))
+  </script>
+</body>
+
+</html>
