@@ -140,7 +140,7 @@ class EventEmitter {
     }
     this.depence[name].push(fn);
   }
-  emit(name,...args) {
+  emit(name, ...args) {
     const tempArr = this.depence[name];
     console.log(tempArr)
     if (tempArr && tempArr.length) {
@@ -161,7 +161,7 @@ const watcher = new EventEmitter();
 watcher.on('say', (...arg) => {
   console.log(...arg)
 })
-watcher.emit('say',1,2,3)
+watcher.emit('say', 1, 2, 3)
 
 // bind
 Function.prototype.myBind = function (context = globalThis) {
@@ -182,10 +182,73 @@ Function.prototype.myBind = function (context = globalThis) {
   }
   // 支持 new 调用方式
   newFunc.prototype = Object.create(fn.prototype)
-  
+
   return newFunc
 }
 const obj3 = {
   name: 'obj3'
 }
-log.myBind(obj1).myBind(obj2).myBind(obj3)(1,2,3)
+// log.myBind(obj1).myBind(obj2).myBind(obj3)(1,2,3)
+
+// 二分搜索
+function BinarySearch1(arr, target) {
+  return search(arr, target, 0, arr.length - 1)
+
+  function search(arr, target, from, to) {
+    if (from > to) {
+      return -1
+    }
+    const mid = Math.floor((from + to) / 2)
+    if (arr[mid] > target) {
+      return search(arr, target, from, mid - 1)
+    } else if (arr[mid] < target) {
+      return search(arr, target, mid + 1, to)
+    } else {
+      return mid
+    }
+  }
+}
+
+// 快速排序
+function quickSort(arr) {
+  if (arr.length < 2) {
+    return arr
+  }
+  const midIndex = Math.floor((arr.length / 2));
+  const midItem = arr.splice(midIndex, 1)[0];
+
+  const right = [],
+    left = [];
+
+  arr.forEach(item => {
+    item < midItem ? left.push(item) : right.push(item)
+  })
+
+  return [...quickSort(left), midItem, ...quickSort(right)]
+}
+
+// 我的排序，不知道什么名字
+// 每次你寻找数组中最大或者最小的一个数,
+// splice出来,放到另一个数组中
+
+  function mySort(arr) {
+    const res = [];
+    if (arr.length <= 1) {
+      res.push(arr[0]);
+      console.log(res)
+      return res
+    }
+    let min = Infinity,
+      minIndex = 0;
+    arr.forEach((item, index) => {
+      if (min > item) {
+        min = item;
+        minIndex = index
+      }
+    })
+    res.push(arr.splice(minIndex, 1)[0])
+    // console.log(arr)
+    return [...res,...mySort(arr)]
+  }
+  
+console.log(mySort([8, 1, 24, 5, 8, 1, 3, 5]));

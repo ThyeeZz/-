@@ -1,6 +1,6 @@
 1、withRouter
   默认情况下组件的this.props 无法访问到history，也就无法实现js跳转
-  从事可以使用withRouter传入路由参数，this.props就可以访问到 history
+  可以使用withRouter传入路由参数，this.props就可以访问到 history
   import React,{Compoent} from 'react';
   import {widthRouter} from 'react-router-dom';
 
@@ -34,3 +34,181 @@
       />
     )
   }
+
+3、生命周期：Mounting Updating Unmounting
+    1)Mounting： constructor -->getInitialState --> getDefaultProps --> componentWillMount ->render->componentDIdMount
+    2)Updating: componentWillReceviveProps -> shouldComponentUpdate -> componentWillUpdate -> render -> componentDidUpdate
+    3)Unmounting: componentWillUnmount
+
+4、props验证
+    static propTypes = {
+        name: PropTypes.string
+    }
+
+5、ref： React.createRef()
+    class App extends Component{
+        constructor{props}{
+            super(props)
+            this.myRef = React.createRef()
+        }
+        render(){
+            return(
+                <input ref={this.myRef} />
+            )
+        }
+        componentDidMount(){
+            console.log(this.myRef.current)
+        }
+    }
+
+6、路由传参
+    1)params:
+        <Router path='/path/:id' component={xx} />
+        <Link to='/path/1' > xx <Link>
+        this.props.history.push({path: `/path/${1}`})
+        // 读取：this.props.math.params.id
+    2)query
+        <Router path='/path' component={xx} />
+        <Link to={{pathname: '/path',query: {id: 1}}} />
+        this.props.history.push({path: 'path', query: {id: 1}})
+        // 读取: this.props.location.query.id
+
+7、异步更新state
+    this.setState((prevState,props)=>{
+        counter: prevStaet + props
+    })
+
+8、Fragment
+    在jsx中使用<div> 有时会破坏语义，可以使用 <Fragment> </Fragmen>包裹内容，
+    或者使用短语发<> </>
+
+9、优雅处理懒加载：<Suspence> 和React.lazy
+    function MyComponent(){
+        const SomeComponent = React.lazy(()=> import('./SomeComponent'))
+        return(
+            <Suspence fallback={<div>loading...</div>}>
+                <SomeComponent />
+            </Suspence>
+        )
+    }
+    fallback 可以接受任何懒加载过程中希望展示的React元素，Suspence组件可以包裹多个懒加载组件
+
+10、基于路由的代码分割
+    import React,{Suspence,lazy} from 'react';
+    import {BrowserRouter as Router,Switch,Route} from 'react-router-dom'
+
+    const Home = lazy(()=> import('./rutes/Home'))
+    Const About = lazy(()=> import('./routes/About'))
+
+    const MyApp = ()=>{
+        return(
+            <Suspence fallback={div>Loading...</div>} >
+                <Switch>
+                    <Route path='/' component={Home} />
+                    <About path='/about' component={About} />
+                </Switch>
+            <Suspence/>
+        )
+    }
+
+11、异常捕获边界：Error boundaries
+    如果模块加载实在会报错，可以通过异常捕获边界处理；
+    当一个class组件中定义了：static getDerivedStateFromError() 或者componentDidCatch()两个
+    生命周期方法中的一个或者两个，纳闷他就变成了一个错误边界，当抛出错误后，请使用static getDerivedStateFromError()
+    渲染备用UI，使用componentDidCatch() 打印错误；
+
+    class ErrorBoundary extends Component{
+        constructor(props){
+            super(props)
+            this.state = {hasError: false}
+        }
+        static getDerivedStateFromError(){
+            // 更新state 使下次更新渲染降级后的UI
+            this.setState({hasError: true})
+        }
+        componentDidCatch(err,errorInfo){
+            console.log(err)
+        }
+
+        render(){
+            const {hasError} = this.state;
+            if(hasError){
+                return <div>shit happends</div>
+            }
+            return this.props.children
+                
+        }
+    }
+
+    <ErrorBoundary>
+        <SomeComponent />
+    </ErrorBoundary>
+
+    只有class组件才能成为错误边界，大多数情况下只需要创建一次错误边界组件就能在全局使用，
+    可以将其包装在最顶层的路由组件
+
+12、Context
+
+13、ref转发：React.forwardRef()，将组件中的ref自动地通过组件传递到其一子组件中的技巧
+    const FancyButton = React.forwardRef((props,ref)=>(
+        <button ref={ref} className='fancyButton'>
+            {props.children}
+        </button>
+    ))
+
+    // 可以直接获取 DOM button 的ref；
+    const ref = React.createRef();
+    <FancyButton ref={ref}>Click Me</FancyButton>
+
+14、高阶组件
+    i)例如两个组件除了获取数据方式不一样，其他逻辑一样，可以通过HOC包装，为其添加特性，例如withRouter
+    ii) 不要在render方法中使用HOC，因为每次return出来的组件都不===，diff算法会将原来的树完全卸载重新挂载
+    iii)务必复制静态方法，因为被包装后的组件将没有原始组件的静态方法
+    iv) ref不会被传递，需要使用ref转发
+
+15、深入JSX
+    i) jsx实际为React.createElement(el,{props},...children)的语法糖，所以使用jsx必须保证在React库的作用范围内
+    ii) 如果没有给prop 赋值，他的默认值为true，表现与Vue相同
+
+16、Hook
+    i) useState
+        1·useState 的参数是state,返回值为当前state和更新state的函数-->const [count, setCount] = useState()
+            state 和 setState 方法可以直接在jsx中使用：
+            return(
+                <p> {count}</p>
+                <button onClick={()=>setState(count+1)}>Click me</button>
+            )
+            不像Class组件中的setState，useState 总是替换他们而不是合并他们
+        
+        2·惰性useState：通过函数返回
+            const [count,setCount] = useState(()=>{
+                return someComputedFunction(props)
+            }) // 此函数仅在初始渲染时调用
+
+
+    ii) useEffect
+        1· useEffect Hook 可以看作 componentDidMount,componentDidUpdate,componentWillUnmount (这三个阶段都会调用useEffect)
+        2· 需要清除的effect
+            useEffect(()=>{
+                // 更新state状态函数
+                function handleClick(status){
+                    setSomeThing()
+                }
+
+                someEffectFunction // mount 和 didUpdate 时调用的逻辑
+
+                return function cleanUp(){
+                    // didUpdate 和 unmount 时调用的逻辑来清除上面的someEffectFunction
+                }
+            })
+        3·跳过effec来优化性能,通过传递第二个参数来让effec对比，如果没有改变会跳过effect
+            useEffect(()=>{
+                document.title = `you have click ${count} times`
+            },[count]) // 仅在count改变时调用
+            只运行一次的 effec：第二个参数传递 []
+            
+            
+        4·Hook 根据调用顺序将effec和state相关联。因此不能在if、循环等条件中使用effect
+
+    iii) 自定义hook
+        相同的 Hook 逻辑可以包装在函数中多处引用

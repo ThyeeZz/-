@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>事件循环题目</title>
+</head>
+
+<body>
+  <script>
+    // 1
+    console.log('start'); // 宏任务1
+    setTimeout(() => { // 宏任务底层
+      console.log('children2'); // 宏任务底层
+      Promise.resolve().then(() => {
+        console.log('children3'); // 宏任务底层 -微任务
+      })
+    }, 0);
+    // start->4->2 ->3->5->7-> 6
+    new Promise(function (resolve, reject) {
+      console.log('children4'); // 宏任务2
+      setTimeout(function () { // 宏任务 底层-1
+        console.log('children5'); // 宏任务底层-1
+        resolve('children6') // 
+      }, 0)
+    }).then((res) => { // 微任务
+      console.log('children7'); // 微任务1
+      setTimeout(() => { // 微任务1-宏任务底层
+        console.log(res);
+      }, 0)
+    })
+
+
+    // 2
+    const p = function () {
+      return new Promise((resolve, reject) => {
+        const p1 = new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve(1)
+          }, 0)
+          resolve(2)
+        })
+        p1.then((res) => {
+          console.log(res); // 1
+        })
+        console.log(3);
+        resolve(4);
+      })
+    }
+
+    p().then((res) => {
+      console.log(res);
+    })
+    console.log('end');
+    // 3-  end- 2 -4
+
+
+    // 3
+    // 1-3-5-4-2-6-7
+    console.log(1); //1
+    setTimeout(function () {
+      console.log(2); //宏任务底层
+    }, 0);
+    new Promise(function (resolve) {
+      console.log(3); // 宏任务
+      resolve(Date.now());
+    }).then(function () { //微任务
+      console.log(4);
+    });
+    console.log(5); // 宏任务
+    setTimeout(function () { // 宏任务底层-1
+      new Promise(function (resolve) {
+        console.log(6);
+        resolve(Date.now());
+      }).then(function () {
+        console.log(7);
+      });
+    }, 0);
+
+    //4
+    // script - syn1 start - syn2 -promise1 -script end -syn1 end -promise2 -setTimeout
+    async function async1() { // 宏任务1
+      console.log('async1 start')
+      await async2()
+      console.log('async1 end') // 宏任务1 -微任务 1
+    }
+    async function async2() { // 宏任务1
+      console.log('async2')
+    }
+    console.log('script start') // 宏任务1
+    setTimeout(function () { // 宏任务2
+      console.log('setTimeout')
+    }, 0)
+    async1(); // 1
+    new Promise(function (resolve) { // 宏任务1
+      console.log('promise1')
+      resolve();
+    }).then(function () {
+      console.log('promise2') // 宏任务1-微任务2
+    })
+    console.log('script end')
+
+
+    // 5
+    // promise1 -> promise2 -> resolvePromise resolved -> promise3
+    let resolvePromise = new Promise(resolve => {
+      let resolvedPromise = Promise.resolve()
+      resolve(resolvedPromise);
+      // 提示：resolve(resolvedPromise) 等同于：
+      // Promise.resolve().then(() => resolvedPromise.then(resolve));
+    })
+    resolvePromise.then(() => {
+      console.log('resolvePromise resolved')
+    })
+    let resolvedPromiseThen = Promise.resolve().then(res => {
+      console.log('promise1')
+    })
+    resolvedPromiseThen
+      .then(() => {
+        console.log('promise2')
+      })
+      .then(() => {
+        console.log('promise3')
+      })
+
+
+    // 6
+    console.log('script start');
+
+    setTimeout(() => { // 宏任务2
+      console.log('Gopal');
+    }, 1 * 2000);
+
+    Promise.resolve() // 宏任务1
+      .then(function () { // 宏任务1 -微任务1
+        console.log('promise1');
+      }).then(function () {
+        console.log('promise2'); // // 宏任务1 -微任务1 微任务
+      });
+
+
+    async function foo() { //宏任务1
+      await bar()
+      console.log('async1 end') //宏任务1 -微任务2
+    }
+    foo()
+
+    async function errorFunc() {
+      try {
+        // Tips:参考：https://zh.javascript.info/promise-error-handling：隐式 try…catch
+        // Promise.reject()方法返回一个带有拒绝原因的Promise对象
+        // Promise.reject('error!!!') === new Error('error!!!')
+        await Promise.reject('error!!!')
+      } catch (e) {
+        console.log(e) // 宏任务1
+      }
+      console.log('async1'); // 宏任务1 -微任务3
+      return Promise.resolve('async1 success') // 宏任务1 -微任务4
+    }
+    errorFunc().then(res => console.log(res)) // 宏任务1 -微任务5
+
+    function bar() {
+      console.log('async2 end') // 宏任务1
+    }
+
+    console.log('script end'); //宏任务1
+    // script start async2 end script end promise1 async1 end error!!! async1 promise2 async1 success Gopal
+
+
+    // 7
+    // 1 - 2 - 3 -6 - 4- 5 - 7 -9
+    new Promise((resolve, reject) => {
+        console.log(1) // 宏任务1
+        resolve()
+      })
+      .then(() => {  // 微任务1
+        console.log(2) // 微任务1 宏任务 1
+        new Promise((resolve, reject) => {
+            console.log(3) // 微任务1 宏任务 2
+            setTimeout(() => {
+              reject();
+            }, 3 * 1000);
+            resolve()
+          })
+          .then(() => { 
+            console.log(4)
+            new Promise((resolve, reject) => {
+                console.log(5)
+                resolve();
+              })
+              .then(() => {
+                console.log(7)
+              })
+              .then(() => {
+                console.log(9)
+              })
+          })
+          .then(() => {
+            console.log(8)
+          })
+      })
+      .then(() => { //微任务2
+        console.log(6)
+      })
+      
+  </script>
+</body>
+
+</html>

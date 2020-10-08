@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bigo-10.05</title>
+</head>
+
+<body>
+  <script>
+    // 1、输入[1,3,1,3,2]，输出数组中唯一一个只存在一项的值，比如如上就是 2
+    function getUnique(target) {
+      const foo = {};
+      target.forEach(item => {
+        if(!foo[item]){
+          foo[item] = 1
+        }else{
+          foo[item] += 1
+        }
+      })
+      const res = Object.entries(foo).find(item => item[1]===1)
+      return res[0]
+    }
+
+    // console.log(getUnique([1, 3, 1, 3, 2]))  // 2
+
+    // 2、从一个数组中拿到前三个最小的值
+    function getMinestN(n,target){
+      const res = [];
+      let i = 0;
+      while(i<n){
+        i++;
+        const tempMin = Math.min(...target);
+        target = target.filter(item=> item!== tempMin);
+        res.push(tempMin)
+      }
+      return res
+    }
+
+    // console.log(getMinestN(4,[2,3,5,2,3,4,6,7,2,6,3,4,2,3,4,2,4,2,3,5,6,8,9])) 
+
+    /*
+      3、
+      [1,2,3,1,2,4,1,3,2,1] [1,2] [3,4,5] =>[3,4,5,3,3,4,5,4,1,3,2,1]
+      说明：第一个输入是原始数组，第二个输入是一个条件：要在原始数组中的连续数组，第三个输入是要替换掉原数组符合参数二条件的数据
+      能够使用的api：
+      1. 数组的长度获取。
+      2. 数组某个下标对应的数字。
+      3. 往数组里push元素。
+    */
+
+    function someFunction(target,condition,replace){
+      let res = []
+      for(let i=0;i<target.length;i++){
+        if(target[i]===condition[0]&&target[i+1]===condition[1]){
+          replace.forEach(item=>{
+            res.push(item)
+          })
+          i++
+        }else{
+          res.push(target[i])
+        }
+      }
+      console.log(res)
+    }
+    someFunction([1,2,3,1,2,4,1,3,2,1],[1,2],[3,4,5] ) //[3,4,5,3,3,4,5,4,1,3,2,1]
+  </script>
+</body>
+
+</html>

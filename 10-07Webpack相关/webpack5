@@ -1,0 +1,244 @@
+1、Webpack 的作用
+  启动本地服务，将ex6，vue、react转换为浏览器可识别的代码，合并压缩代码，css前缀补齐等等
+
+2、Webpack配置组成
+  module.exports = {
+    entry: '', // 指定入口文件
+    output: '', // 指定输出文件路径，名称
+    mode: '', // 环境
+    module: { 
+      rules: [ // loader 配置
+        {test: '', use: ''}
+      ]
+    },
+    plugins: [ // 插件配置
+      new XXPlugin() 
+    ]
+  }
+
+3、常用 Loader
+  为什么要用loader，因为webpack 只能识别 js,JSON两种模块类型，所以需要loader 吧其他文件转为可识别模块
+  es6 --> bable-loader --> 配合.babelrc使用
+  vue --> vue-loader
+  css --> css-loader (加载css，转为common.js)，style-loader(在head中插入style标签)
+  sass --> sass-loader(将sass 转为 css)
+  图片、字体 --> file-loader(处理图片，文字)、url-loader(和file-loader类似，还可以设置较小资源转为base64)
+
+4、常用 plugin
+  插件用于bundle文件优化、资源管理，环境变量注入等等
+  clean-webpack-plugin: 大抱歉自动清理dist 目录
+  html-webpack-plugin: 自动生成html ，并将打包后的js文件插入进去
+  mini-css-extract-plugin: 把css 提取成单独的文件，与style-loader互斥，不能同时使用
+
+  关于代码压缩：
+  1· js文件压缩，默认开启内置的 terser-webpack-plugin,打包时自动压缩js代码；
+  2· css文件压缩： optimize-css-assets-webpack-plugin,同时使用cssnano处理器；
+
+    plugins: [
+      new OptimizeCssAssetsPlugin({
+        assetNameRegExp: /\.css$/g,
+        cssProcessor: require('cssnano')
+      })
+    ]
+
+  3· html 压缩：修改 html-webpack-plugin 设置压缩参数
+
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: path.join(__dirname, 'src/index.html'),
+        filename: 'index.html',
+        chunks: ['main', 'other'], //要包含哪些chunk
+        inject: true, //将chunks自动注入html
+        minify: { // 压缩相关
+          html5: true,
+          collapseWhitespace: true, //压缩空白字符
+          preserveLineBreaks: false,
+          minifyCSS: true,
+          minifyJS: true,
+          removeComments: true
+        }
+      })
+    ]
+
+5、webpack 性能优化
+  I) 开发环境性能优化
+    1· 模块热替换(HotmoduleReplacement)
+      开启dev-server 后，默认只要有一个文件变化，就会重构，刷新浏览器页面
+    
+    2· source-map
+      source-map 是一种提供源码到构建后代码映射的技术，报错是通过source-map 可以定位到源码
+      推荐组合： 开发环境：速度快，调式友好：eval-source-map
+        生产环境： 内联会让代码体积变大，所以生产环境不用内联： nosources-source-map,hidden-source-map
+
+  II) 生产环境性能优化
+    1· 使用文件指纹进行版本控制和缓存
+      当设置了http强缓存，比如有效期一天，如果不适用hash ，当这个文件变了，因为文件名没有变，所以客户端还是用的旧的缓存
+      ·hash：构建的 hash，每次构建都会改变，不建议使用
+      ·chunkhash： 和webpack打包的chunk有关，不同的entry 回生成不用的chunkhash 值
+      ·contenthash：根据文件内容来定义hash ，问价内容不变则contenthash永远不变，推荐在css文件上使用
+
+      //js 文件的指纹设置， 设置 output 的 filename，使用 [chunkhash]
+      module.exports = {
+        output: {
+          filename: '[name][chunkhash:8].js',
+          path:__dirname+'/dist'
+        }
+      }
+
+      // css文件的指纹设置，用 min-css-extract-plugin 将css从js提取出来，设置 contenthash
+      plugins: [
+        new MiniCssExtractPlugin({
+          filename: '[name][contenthash:8].css'
+        })
+      ]
+
+    2· tree shaking
+      一个模块可能有多个方法，只要其中一个被使用到了，整个文件都会被打包到 bundle 中，treeshakingh 就是用来去除没用到的方法的
+      使用： webpack 默认支持，在.bablerc 里面设置 module: false即可，webpack在 production mode 情况下默认开启
+
+    3· code split
+      将一个大的bundle 文件拆包，拆包的方案可以在cacheGroups 里配置
+      ·splitChunks：
+
+      // splitChunks默认配置
+      optimization: {
+          splitChunks: {
+            chunks: 'all',  // 无论同步引入还是异步引入
+            cacheGroups: {
+              vendors: {
+                test: /[\\/]node_modules[\\/]/,  // 匹配node_modules目录下的文件
+                priority: -10   // 优先级配置项
+              },
+              default: {
+                minChunks: 2,  // 至少引用了2次
+                priority: -20,   // 优先级配置项
+                reuseExistingChunk: true
+              }
+            }
+          }
+        }
+      会将 mode_modules 文件夹中的模块打包进一个叫 vendors的bundle中，
+      所有引用超过两次的模块分配到 default bundle 中，可以通过 priority 来设置优先级
+
+    4· DLL
+      将第三方库和业务基础包单独打包成一个文件，只在第一次打，或者需要更新依赖的时候打，此后每次就可以只打
+      自己的资源包，加快了构建速度
+      方法： 使用 DELLPlugin 进行分包， DllReferencePlugin 对 manifest.json 引用
+
+      · 分包需要单独的配置文件：
+      // webpack.dll.js
+      module.exports={
+        entry: {
+          lib: [
+            'lodash',
+            'jquery'
+          ]
+        },
+        output: {
+          filename: '[name]_[chunkhash].dll.js',
+          path: path.join(__dirname, 'build/lib'),
+          library: '[name]' // 打包后对外暴露的全局变量名称
+        },
+        plugins: [
+          new webpack.DllPlugin({
+            name: '[name]', // manifest.json中的name，要与ouput.library名一致
+            path: path.join(__dirname, 'build/lib/manifest.json'),
+          })
+        ]
+      }
+
+      · 在package.json 中添加命令对 dll 单独打包：
+      "script":{
+        "dll": "webpack --config webpack.dll.js"
+      }
+
+      · 使用 DllReferencePlugin 对 manifest.json进行引用，告诉 webpack 使用了那些动态链接库，不用再打包里面的东西
+      // webpack.prod.js
+      new webpack.DllReferencePlugin({
+        manifest: require('./build/lib/manifest.json')
+      }),
+
+      · 使用 addAssetHtmlWebpackPlugin 将 dll 资源插到 html 里面
+      // webpack.prod.js
+      new addAssetHtmlWebpackPlugin([
+        {
+          filepath: path.resolve(__dirname, './build/lib/*.dll.js'),
+          outputPath: 'static', // 将*.dll.js拷贝后的输出路径，相对于html文件
+          publicPath: 'static' 
+        }
+      ])
+    
+    5· 多进程打包
+      使用 thread-loader 开启多进程打包，加快打包速度
+      启动进程大概需要 600ms，进程通信也有花销，只有项目较大时才适合
+
+      module: {
+        rules: [
+          {
+            test: /.js$/, 
+            use: [
+              {
+                loader: 'thread-loader',
+                options: {
+                  workers: 2 //开启两个进程
+                }
+              },
+              {
+                loader: 'babel-loader',
+                options: {
+                  presets: ['@babel/preset-env'],
+                  cacheDirectory: true 
+                }     
+              }
+            ]
+          },
+        ]
+      }
+    
+    6· 多页面打包通用配置
+      多页面打包需要多个入口文件，多个 HtmlWebpackPlugin 产生多个html。我们不可能手写很多个入口和 HtmlWebpackPlugin。
+      方案：动态获取entry 和设置 html-webpack-plugin 数量
+      
+      // 核心方法
+      const setMPA = () => {
+        const entry = {};
+        const htmlWebpackPlugins = [];
+
+        const entryFiles = glob.sync(path.join(__dirname, './src/*/index.js'));
+        entryFiles.forEach(entryFile => {
+          const match = entryFile.match(/src\/(.*)\/index\.js/);
+          const pageName = match && match[1];
+
+          entry[pageName] = entryFile;
+          htmlWebpackPlugins.push(
+            new HtmlWebpackPlugin({ 
+              template: path.join(__dirname, `src/${pageName}/index.html`),
+              filename: `${pageName}.html`,
+              chunks: [pageName], //要包含哪些chunk
+              inject: true, //将chunks自动注入html
+              minify: {
+                html5: true,
+                collapseWhitespace: true,
+                preserveLineBreaks: false,
+                minifyCSS: true,
+                minifyJS: true,
+                removeComments: false
+              }
+            }),
+          )
+        })
+
+        return {
+          entry,
+          htmlWebpackPlugins
+        }
+      }
+
+
+
+
+
+
+
+
+

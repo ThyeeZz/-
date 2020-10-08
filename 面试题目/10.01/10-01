@@ -1,0 +1,106 @@
+1、如何给span标签设置高度，不得使用display：inline-block；
+    亲测
+    a）父级标签设置：display：flex
+    b）span标签设置：diaplay：table-cell
+    c）span标签设置：float：left；
+    d）span标签设置：position:absolute;
+
+    BFC的触发方式：
+        float除了none以外的；
+        overflow除了visibility以外；
+        position为absolute、fixed；
+        display为inline-block；
+        display以table-开头；
+        还有flex元素 等等
+
+2、beforeMount能否获取到window？能否获取到$el
+    可以访问window，无法获取$el
+
+3、递归太深，如何优化：尾递归
+    function fac(n,total){
+        if(n===1) return 1
+        return (n-1,n*total);
+        // 将自身的调用结果传递给函数作为参数
+    }
+    fac(5,1)
+
+4、wacth、computd的区别
+    computed：时一个新的属性，惰性，也就是依赖的属性变化，且第一次访问才会执行，具有缓存功能
+    wacth：每次改变都会直接执行
+
+5、HTTP和TCP的关系
+    互联网模型分为4层：
+    1：Application：应用层 --》 HTTP，http的责任时定义数据，规定每段数据以什么形式才能被另一台计算机所理解
+    2：Transport： 传输层 --》 TCP：Tcp传输数据的核心是讲数据分为若干段并将每段数据按顺序标记，可以被另一方接收并拼成完整数据
+    3：Internet： 互联网 --》 IP
+    4：Hardware： 硬件 --》
+
+6、JS的继承，原型与原型链
+    (i):1、原型链继承：过多的继承了没用的属性
+        Father.prototype.lastName = 'x';
+        const father = new Father();
+        father.name = 'y';
+        Child.prototype = father;
+        也会继承Father自身的name属性
+        
+    2、借用构造函数：无法继承原型上的属性,每次构造要多走一个函数
+        function Child(name,age){
+            Father.call(this,name,age)
+        }
+
+    3、共享原型：不能随意改动自己的原型，因为会将多个共享的原型，会全部被修改
+        Child.prototype = Father.prototype;
+
+    4、圣杯模式：引入中间函数
+        function F = Father.prototype;
+        Child.prototype = new F();
+
+        // 封装
+        const inherit = (function(){ // 闭包私有化变量，外部无法访问
+            const F = function(){};
+            F.prototype = Origin.prototype;
+            Target.prototype = new F();
+            Target.prototype.constructor = Target;
+        }())
+
+    (ii): 1、new 操作：
+        const person = new Person()
+        隐式生成一个this = {}；实际上这个对象中有一个隐藏属性：__proto__： Person.prototype;
+        所哟一实例对象的__proto__永远指向构造函数的 prototype；
+    2、关于 prototype；
+        Person.prototype.name = 'sunny';
+        function Person(){}
+        const person = new Person();
+        Person.prototype = {name: 'cherry'}
+        person.name // sunny
+    3、Object.create(Person)可以创建 实例__proto__指向Person.prototype的对象；
+        绝大多数对象都继承制Object.prototype，但也有例外
+        Object.create(null) 可以创建无原型的对象
+    
+        
+5、解构赋值的默认值
+    const demo = {a: false, b: undefined, c: null};
+    const {a = 1, b = 2, c = 3} = demo;
+
+    console.log(a, b, c); // false,2,null
+    结构复制允许存在默认值，通过===判断一个位置是否有值，仅当一个位置为undefined时，默认值才会生效
+
+7、说一下webapack打包优化
+
+8、for...in 和for...of的区别
+    for in遍历的是数组的索引（即键名），而for of遍历的是数组元素值。
+    for in会遍历到原型上的属性
+
+9、箭头函数能否当作构造函数，有没有prototype属性
+    没有，不能，没有this
+    因为没有prototype,无法让实例的__proto__指向，所以无法作为构造函数；
+    也没有this，当call,apply遇到箭头函数时，第一个参数会被忽略
+
+10、vue的隔代遗传,provide 和inject 如果爷爷底下的组件也用provide 遗传 那么子组件用谁的值
+    最近父级的provide
+    
+11、css flex 布局 如果缩放 超过了父的长度,那么会如何缩放
+    shink 如果为1自动缩放，如果为0 不会缩小
+
+12、宏任务 settimeout 是先放在栈里,还是先运行定时任务然后 放在栈里
+    我觉得时先运行，将回调函数放到站里面

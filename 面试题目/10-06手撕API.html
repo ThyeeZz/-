@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10-06手撕API</title>
+</head>
+
+<body>
+  <script>
+    // 1、冒泡
+    function bubbleSort(target) {
+      if (target.length <= 1) return target;
+      for (let i = 0; i < target.length; i++) {
+        for (let j = i + 1; j < target.length; j++) {
+          if (target[j] < target[i]) {
+            [target[i], target[j]] = [target[j], target[i]];
+          }
+        }
+      }
+      console.log(target)
+    }
+
+    bubbleSort([1, 4, 8, 4, 9, 3, 2, 5])
+
+    // 2、快速排序
+    function quickSort(target) {
+      if (target.length <= 1) return target
+      const midIndex = Math.floor(target.length / 2);
+      const midItem = target.splice(midIndex, 1)[0];
+      const [left, right] = [
+        [],
+        []
+      ];
+      target.forEach(item => {
+        item < midItem ? left.push(item) : right.push(item)
+      });
+      return [...quickSort(left), midItem, ...quickSort(right)]
+    }
+
+    // 3、选择排序,每次循环找个最小的放到最前面
+    function chooseSort(target) {
+      const res = [];
+      while (target.length > 0) {
+        let [min, minIndex] = [Infinity, Infinity];
+        target.forEach((item, index) => {
+          if (item < min) {
+            min = item;
+            minIndex = index
+          }
+        })
+        target.splice(minIndex, 1);
+        res.push(min)
+      }
+      return res
+    }
+
+    // 4、new
+    function _new(target, ...args) {
+      if (typeof target !== 'function') {
+        throw new Error(target + 'is not function')
+      }
+      const _this = {};
+      target.call(_this, ...args);
+      _this.__proto__ = target.prototype;
+      return _this;
+    }
+
+    function Foo(age) {
+      this.age = age
+      this.say = function () {
+        console.log(this.age)
+      }
+    }
+    Foo.prototype.name = 'test'
+
+    const foo = _new(Foo, 13)
+
+    // 5、instanceof
+    function _instanceof(insatnce, target) {
+      let tempPrototype = insatnce.__proto__;
+
+      while (tempPrototype !== null) {
+        if (tempPrototype === target.prototype) {
+          return true
+        }
+        tempPrototype = tempPrototype.__proto__;
+      }
+      return false
+    }
+    // function _instanceof(left, right) {
+    //   let leftVal = Object.getPrototypeOf(left);
+    //   const rightVal = right.prototype;
+
+    //   while (leftVal !== null) {
+    //     if (leftVal === rightVal)
+    //       return true;
+    //     leftVal = Object.getPrototypeOf(leftVal);
+    //   }
+    //   return false;
+    // }
+
+    // 6、Object.create()
+    function objectCreate(proto, object) {
+      if (typeof proto !== 'null' && typeof proto !== 'function' && typeof proto !== 'object') {
+        throw new Error('Object prototype can only be function or object or null')
+      }
+      const obj = {}
+      obj.__proto__ = proto
+      if (object) {
+        Object.defineProperty(obj, object)
+      }
+      return obj
+    }
+
+    // 7\ Map
+    Array.prototype._map = function (callback, thisArg) {
+      if (typeof callback !== 'function') {
+        throw new Error('callback only can be a function')
+      }
+      thisArg = thisArg || window;
+      const caller = this;
+      let [index, len] = [0, caller.length];
+      while (index < len) {
+        let value = caller[index];
+        caller[index] = callback.call(thisArg, value, index, caller);
+        index++;
+      }
+    }
+
+    // 8\ Filter
+    Array.prototype._filter = function (callback, thisArg) {
+      if (typeof callback !== 'function') {
+        throw new Error('callback only can be a function')
+      }
+      thisArg = thisArg || window;
+      const caller = this;
+      let [index, len, res] = [0, caller.length, []];
+      while (index < len) {
+        let value = caller[index];
+        if (callback.call(thisArg, value, index)) {
+          res.push(value)
+        }
+        index++;
+      }
+      return res
+    }
+
+    // 9、数组扁平化
+    Array.prototype._flat = function () {
+      return this.reduce((pre, cur) => {
+        return (cur instanceof Array ? pre.concat(cur._flat()) : pre.concat(cur))
+      }, [])
+    }
+    const arr = [1, [2, 3],
+      [4, [5, 6]], 7
+    ]
+    // arr._flat()
+
+    // 10\ call apply bind
+    Function.prototype._call = function (thisArg, ...args) {
+      console.log(arguments)
+      const context = thisArg || window;
+      context.fn = this;
+      const res = context.fn(...args)
+      delete context.fn
+      return res
+    }
+
+    Function.prototype._apply = function (thisArg, [...args]) {
+      const context = thisArg || window;
+      context.fn = this;
+      const res = context.fn(...args)
+      delete context.fn;
+      return res
+    }
+
+    Function.prototype._bind = function (thisArg) {
+      const context = thisArg || window;
+      context.fn = this;
+      return function (...args) {
+        context.fn(...args)
+      }
+    }
+
+    const test = function (a, b, c) {
+      console.log(this.age, a, b, c)
+    }
+
+    // 防抖
+    function debounce(callback, delay) {
+      if (typeof callback !== 'function') {
+        throw new Error('callback only can be a function')
+      }
+      let timer = null;
+      return function () {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null
+        } else {
+          timer = setTimeout(callback, delay * 1000)
+        }
+      }
+    }
+
+
+    // 节流
+    function throttle(callback, interval) {
+      if (typeof callback !== 'function') {
+        throw new Error('callback only can be a function')
+      }
+      let timer = null;
+      return function () {
+        if (!timer) {
+          timer = setTimeout(() => {
+            callback();
+            timer = null;
+          }, interval * 1000);
+        }
+      }
+    }
+
+    window.onresize = throttle(function () {
+      console.log('onresize')
+    }, 1)
+  </script>
+</body>
+
+</html>

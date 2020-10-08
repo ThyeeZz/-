@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <p>{{count}}</p>
+    <button @click='handleClick'>click Me</button>
+  </div>
+
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data() {
+        return {
+          count: 1
+        }
+      },
+      methods: {
+        handleClick() {
+          let cb = [];
+          for (let i = 0; i < 10; i++) {
+            this.count = i
+          }
+          Promise.resolve().then(() => {
+            this.sleep(2000)
+            console.log(this.count)
+            this.count++
+          })
+        },
+        sleep(sleepTime) {
+          for (var start = new Date; new Date - start <= sleepTime;) {}
+        }
+      }
+    })
+  </script>
+
+</body>
+
+</html>

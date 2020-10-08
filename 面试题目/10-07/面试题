@@ -1,0 +1,30 @@
+1、说一说 EventLoop
+  js时单线程，所有的同步任务都是在执行栈中排队等待一个个执行，
+  当遇到余部任务的时候，会将其挂起继续执行同步任务，等到异步任务返回结构后，将这个事件放到一个事件队列里面，
+  等到栈里的任务执行完，去队列中查看有没有异步任务，如果有，取出排在第一位的事件到执行栈中执行，直到全部执行完。
+
+2、如何实现一个findIndex
+  for循环 找到符合的 返回下标
+
+3、说一下Vue-Router的实现原理
+  hash：监听 onhashChange事件实现
+  history：利用html5新特性，window.history.pushState,window.history.replaceState
+
+4、Vue-Router初始化是发生在什么时候
+  beforeCreate
+  vue-router 源码 利用mixin混入
+
+5、script放在body头部就一定会阻塞吗
+  async：立即加载该脚本，但不影响其他脚本的加载
+  defer：表示可以延迟到文档被完全解析和显示之后再执行，里卖弄不应有修改dom的内容
+  如果我们不需要再页面显示之初就用到的 可以 defer加载，页面加载的同时需要使用到的就可以async异步加载
+
+6、js中改变transform的left和right对比于css修改transform
+  js性能损耗更高吧
+
+7、如果我将key设置为了一个Math.random()可以吗
+  不可以，新旧两颗虚拟dom树的key不一样，会导致卸载重新渲染
+
+8、vue.$nextTick
+  主要利用了js的事件循环机制
+  用异步队列的方式控制DOM 更新和nextTick 执行的先后顺序，保证早DOM 更新后执行nextTick

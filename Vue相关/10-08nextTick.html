@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10-08 nextTick</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <button id='btn'>增加一个</button>
+  <script>
+    const app = document.getElementById('app');
+
+    // nextTick 的回调数组
+    const cbs = []
+    // observer
+    class Observer {
+      constructor() {
+        this.observers = new Set();
+      }
+      depend() {
+        if (isUpdate) {
+          this.observers.add(isUpdate)
+        }
+      }
+      notify() {
+        this.observers.forEach(obs => obs())
+      }
+    }
+
+    let isUpdate = null;
+    const autoRun = (update) => {
+      function autoRunWrapper() {
+        isUpdate = autoRunWrapper;
+        update();
+        isUpdate = null;
+      }
+      autoRunWrapper()
+    }
+
+    const observer = new Observer()
+
+    const data = {
+      name: 'xyz',
+      cars: ['audi', 'benz', 'bmw'],
+      family: {
+        son: 'yyy',
+        daughtor: "zzz"
+      }
+    }
+
+    // 重写数组方法
+    const methoods = ['push', 'splice', 'sort', 'shift', 'unshift', 'pop'];
+    methoods.forEach(function (item) {
+      const originMethod = Array.prototype[item];
+
+      Array.prototype[item] = function (...args) {
+        const context = this;
+        originMethod.call(context, ...args);
+        observer.notify()
+      }
+    })
+
+    function setObserve(obj) {
+      Object.keys(obj).forEach(prop => {
+        let temp = obj[prop];
+        if (typeof temp !== 'object') {
+          Object.defineProperty(obj, prop, {
+            get() {
+              console.log('get' + prop)
+              return temp
+            },
+            set(val) {
+              console.log('set---' + prop + '---' + val);
+              observer.notify()
+              temp = val
+            }
+          })
+        } else {
+          setObserve(temp)
+        }
+      })
+    }
+    setObserve(data)
+
+    autoRun(() => {
+      observer.depend()
+      // $nextTick(()=>{
+      //   console.log(data.cars)
+      // })
+      render(data.cars)
+    })
+
+
+    function render(data) {
+      app.innerHTML = '';
+      const fragment = document.createDocumentFragment()
+      data.forEach(item => {
+        const _p = document.createElement('p')
+        _p.innerText = item;
+        fragment.appendChild(_p)
+      })
+      
+      app.appendChild(fragment)
+      
+    }
+
+
+    function $nextTick(callback) {
+      // Promise.resolve().then(() => {
+      //   cbs.push(callback);
+  
+      // }).then(()=>{
+      //   cbs.forEach(cb => {
+      //     cb()
+      //   })
+      // })
+      cbs.push(callback);
+
+        cbs.forEach(cb => {
+          cb()
+        })
+    }
+
+    const btn = document.getElementById('btn');
+    btn.onclick = function () {
+      $nextTick(() => {
+        console.log(document.getElementsByTagName('p'))
+      })
+      data.cars.push('auto');
+    }
+  </script>
+</body>
+
+</html>

@@ -8,7 +8,9 @@
 </head>
 
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <ul id="app__ul"></ul>
+  </div>
 
   <!-- <ul>
     <li>1</li>
@@ -30,47 +32,75 @@
       }
     ];
 
-    createElement(
-      "div", {
-        className: "box"
-      },
-      createElement(
-        "span",
-        null,
-        createElement("em", null, "title")),
-      createElement("div", null, "1111")
-    )
+    // jsx语法
+    /*
+      data.map(item=>{
+        return (
+          <div>{item.name}</div>
+        )
+      })
+    
+    */
+    const _app = document.getElementById("app");
+    const _app__ul = document.getElementById("app__ul")
+
+    // render 函数,生成jsx语法
+    function render(){
+      return data.map(item=>{
+        return (
+          `<li>${item.name}</li>`
+        )
+      })
+    }
+  const vnodeTree = render();
+
+  vnodeTree.forEach(item=>{
+    console.log(item.split('<').join("").split('>')[1].split('/')[0])
+    let tag = item.split('<').join("").split('>')[0]
+    let children = item.split('<').join("").split('>')[1].split('/')[0];
+    _app__ul.appendChild(createElement(
+      tag,null,children
+    ))
+  })
+
 
     function createElement(tag, data = {}, ...children) {
+      const getType = Object.prototype.toString;
+      const objType = ["[object HTMLDivElement]", "[object HTMLSpanElement]", "[object HTMLElement]"]
       const _tag = document.createElement(tag);
       for (let prop in data) {
         if (data.hasOwnProperty(prop)) {
-          if (prop === 'className') {
-            _tag.setAttribute('class', data[prop])
-          }
-          if (prop === 'text') {
-            _tag.innerText =  data[prop]
+          _tag.setAttribute(prop, data[prop])
+        }
+      }
+      if (children) {
+        children.forEach(html => {
+          if (typeof html==='object') { // 此判断条件绝对有误
+            _tag.appendChild(html)
           } else {
-            _tag.setAttribute(prop, data[prop])
+            _tag.innerText = html;
           }
 
-        }
+        })
       }
       return _tag
     }
 
-    const _app = document.getElementById("app");
-    app.appendChild(createElement(
-      "div", {
-        className: "box",
-        text: '王墉老舔狗了'
-      },
-      createElement(
-        "span",
-        null,
-        createElement("em", null, "title")),
-      createElement("div", null, "1111")
-    ))
+
+    // app.appendChild(createElement(
+    //   "div", {
+    //     className: "box",
+    //     text: '王墉老舔狗了'
+    //   },
+    //   createElement(
+    //     "span",
+    //     null,
+    //     createElement("em", null, "title")),
+    //   createElement("div", {
+    //     className: 'test'
+    //   }, "1111")
+    // ))
+
   </script>
 </body>
 

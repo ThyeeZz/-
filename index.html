@@ -1,11 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    .wrapper {
+      height: 200px;
+      margin: auto;
+    }
+
+    h3 {
+      display: inline-block;
+      margin: auto;
+    }
+
+    .test {
+      overflow: auto;
+      height: 100px;
+    }
+  </style>
 </head>
+
 <body>
-  
+  <div class="wrapper">
+    <h3>haha</h3>
+  </div>
+
+  <script>
+    //  const p1 = new Promise(resolve=>{
+    //    resolve('p1')
+    //  })
+
+    //  const p2 = new Promise(reject=>{
+    //    reject('p2')
+    //  })
+
+    //  const p3 = new Promise(resolve=>{
+    //    throw new Error("p3")
+    //  })
+
+    //  Promise.all([p1,p2,p3]).then(res=>{
+    //    console.log(res)
+    //  }).catch(err=>{
+    //    console.log(err)
+    //  })
+
+    //  Promise.allSettled([p1,p2,p3]).then(res=>{
+    //    console.log(res)
+    //  })
+
+    // var init = (function(){
+    //   var name = 'abc';
+    //   function callName(){
+    //     console.log(name)
+    //   }
+    //   return function(){
+    //     callName()
+    //   }
+    // }())
+
+
+    const start = +new Date()
+    const bar = 'abcabcbb';
+
+    // let result = []
+
+    // for(let index=0;index<bar.length;index++){
+    //   getUnique(bar.substring(index))
+    // }
+    // function getUnique(target) {
+    //   let temp = []
+    //   tempTarget = target.substring()
+    //   let i = 0;
+    //   while (!temp.includes(tempTarget[i])) {
+    //     temp.push(tempTarget[i]);
+    //     i++
+    //   }
+    //   result.push(temp.length)
+    // }
+    // console.log(Math.max(...result))
+
+
+
+    // setTimeout(() => {   
+    //   console.log(1)  //微任务3，宏任务1
+
+    //   new Promise((resolve) => {
+    //     resolve()
+    //     // Promise1
+    //   }).then(() => {
+    //     console.log(2) //微任务3，微任务1
+    //   });
+    // })
+
+    // // setTimeout2
+    // setTimeout(() => {   
+    //   console.log(3) // 微任务4
+    // })
+    //                                            // 4-5-7-6-8-1-3-2
+    // new Promise((resolve) => {   //宏任务1
+    //   console.log(4)  // 宏任务2
+    //   resolve()
+    //   console.log(5)  // 宏任务3
+    //   // Promise2
+    // }).then(() => {  
+    //   console.log(6) // 微任务1
+    // })
+
+    // console.log(7)   // 宏任务4
+
+    // new Promise((resolve) => {  
+    //   resolve()
+    //   // Promise3
+    // }).then(() => {
+    //   console.log(8) //微任务2
+    // })
+
+    function Parent() {
+      this.x = 100;
+    }
+    Parent.prototype.getX = function () {
+      return this.x;
+    };
+
+    function Child() {
+      Parent.call(this);
+      this.y = 200;
+    }
+    // // Child.prototype.__proto__ = Parent.prototype;//【修改proto原型链指向】在IE低版本浏览器中不支持
+    // let A = Object.create(Parent.prototype);
+    // //【Object.create】先创建一个空对象，让其原型链指向我们指定的原型对象
+    // Child.prototype = Object.assign(A, Child.prototype);
+    // //【Object.assign】在使用该方法，让子类的原型对象和这个空对象合并
+    // // 此时子类原型对象的原型链指向变为了父类的原型对象
+    // Child.prototype.getY = function () {
+    //   return this.y;
+    // };
+
+    // let c1 = new Child;
+    // console.log(c1); //  Child {x: 100, y: 200}
+    // console.log(c1.__proto__); //{getY: ƒ} 子类原型上的方法
+    // console.log(c1.__proto__.__proto__); // {getX: ƒ, constructor: ƒ} 父类原型上的方法 和constructor
+
+    const inherit = (function (Origin, Target) {
+      const F = function () {}
+      F.prototype = Origin.prototype;
+      Target.prototype = new F();
+      // Target.prototype.constructor = Target;
+    }(Parent, Child))
+    Child.prototype.getY = function () {
+      return this.y;
+    };
+    let c2 = new Child()
+    console.log(c2); //  Child {x: 100, y: 200}
+    console.log(c2.__proto__); //{getY: ƒ} 子类原型上的方法
+    console.log(c2.__proto__.__proto__); // {getX: ƒ, constructor: ƒ} 父类原型上的方法 和constructor
+
+
+
+    // 如何实现if(a===1&&a===2&&a===3)
+    
+    let a = 1;
+    Object.defineProperty(windwo,'a',{
+      get(){
+        return a ++
+      }
+    })
+    if (a == 1 & a == 2 && a == 3) {
+      console.log('success')
+    }
+  </script>
 </body>
+
 </html>
