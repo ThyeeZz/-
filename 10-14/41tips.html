@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>41 JavaScript Tips</title>
+</head>
+
+<body>
+  <script>
+    // 1、数组交集
+    const [arr1, arr2] = [
+      [1, 2, 3, 4, 5],
+      [2, 3, 6]
+    ]
+
+    function getIntersection(list1, list2) {
+      const res = list1.filter(v => list2.indexOf(v) > -1)
+      console.log(res)
+      return res
+    }
+    getIntersection(arr1, arr2)
+
+    const [arr3, arr4] = [
+      [{
+        name: 'x',
+        id: 1
+      }, {
+        name: 'y',
+        id: 2
+      }, {
+        name: 'z',
+        id: 3
+      }],
+      [{
+        name: 'x',
+        id: 1
+      }, {
+        name: 'z',
+        id: 3
+      }]
+    ]
+
+    function getIntersection2(list1, list2) {
+      const res = list1.filter(v => list2.some(item => JSON.stringify(item) === JSON.stringify(v)))
+      console.log(res)
+      return res
+    }
+    getIntersection2(arr3, arr4)
+
+    // 2、并集
+    function getUnion(list1, list2) {
+      const res = list1.concat(list2.filter(v => !list1.includes(v)))
+      console.log(res)
+      return res
+    }
+    getUnion(arr1, arr2)
+
+    // 数组差集
+    function getSubtraction(list1, list2) {
+      const res = list1.filter(v => !list2.includes(v))
+      console.log(res)
+      return res
+    }
+    // getSubtraction(arr1,arr2)
+
+    // 实现一个私有变量
+    let a = (function(arg){
+      const someArg = arg;
+      return {
+        getName: function(){
+          return someArg
+        }
+      }
+    })('zyx')
+  </script>
+</body>
+
+</html>
