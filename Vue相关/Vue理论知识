@@ -57,3 +57,38 @@
 11、vue.$set 原理
   数组：通过 Array.splice 方式触发响应式
   对象：通过触发Object.definedProperty 的setter 方式
+
+12、vue的工作流程
+  ·初始化lifrCircle,event,render
+  ·-》beforeCreate
+  ·初始化inject,state,provider
+  --created
+  判断是否又templat --> 有就将template编译成render函数 ，否则将el的outHtml作为模板编译成render函数
+  调用beforeMount
+  创建 vm.$el并替换 el
+  调mounted
+  -----》更新阶段，当数据变化时，调用beforeUpdate -》diff虚拟dom重新渲染 -》调用updated钩子
+  当vm.$destory被调用
+  调用beforeDestory
+  清除与父级的联系，卸载所有的watch，监听器
+  调用destoryed
+
+13、vue的首屏优化
+  1· 减少非必要的全局组件、全局指令的注册
+  2· 手动引入各类模块，减少main.js 的引入内容
+  3· CDN 优化，可以将一些vue的全家桶通过在 index.html 进行CDN 引入
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/vuex/3.1.0/vuex.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue-router/3.0.4/vue-router.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
+    <script src="https://cdn.bootcss.com/element-ui/2.7.2/index.js"></script> 
+   配合webpack extenals防止被打包到最终的bundle中
+    webpack.config.js中：
+
+    extenals：{
+      JQuery: 'Jquery'
+    }
+
+  4· 路由懒加载
+
+

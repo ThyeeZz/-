@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <style>
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+    }
+
+    .inner {
+      width: 100px;
+      height: 100px;
+      border: 1px solid red;
+      margin: 50% 50%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <script src="./test.js"></script>
+    <div class="inner"></div>
+  </div>
+  <script>
+    function A() {
+
+      this.age = 'x'
+
+      this.on = function () {
+        console.log(this.age)
+      }
+    }
+
+
+    const  foo = {
+      date: new Date(),
+      fn: function(){},
+      math: Math.floor(1.2)
+    }
+
+    const bar1 = JSON.parse(JSON.stringify(foo))
+    const bar2 = {
+      date: foo.date.toString(),
+      fn: foo.fn.toString(),
+      math: foo.math.toString()
+    }
+    console.log(bar1,bar2)
+  </script>
+</body>
+
+</html>

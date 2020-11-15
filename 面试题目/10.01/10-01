@@ -61,7 +61,7 @@
             F.prototype = Origin.prototype;
             Target.prototype = new F();
             Target.prototype.constructor = Target;
-        }())
+        }(Origin，Target))
 
     (ii): 1、new 操作：
         const person = new Person()

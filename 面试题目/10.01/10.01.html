@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>10-01</title>
 </head>
+
 <body>
   <script>
     // 1、深度克隆
@@ -52,17 +54,40 @@
       解释: 因为无重复字符的最长子串是 "wke" "kew"，所以其长度为 3。
       请注意，答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
     */
+const result = [];
+    function longestUnique(str, start = 0) {
+      let [end, len] = [1, str.length];
+      
+      let tempStr = str.substring(start, end);
+      while (end < len) {
 
+        if (!tempStr.includes(str[end])) {
+          tempStr = str.substring(start, end);
+          console.log(tempStr)
+          result.push(tempStr.length)
+          end++
+        }else{
+          start += 1;
+          newStr = str.substring(start)
+          longestUnique(newStr,start)
+        }
+
+      }
+      // console.log(result);
+      return Math.max(...result)
+    }
+    console.log(longestUnique('abcabcbb'))
     // 3、给定一个字符串,得到一个数组,出现次数由大到小排序
     const sortStr = 'abcabcbba';
-    function mySort(target){
+
+    function mySort(target) {
       let obj = {}
       for (let i = 0; i < target.length; i++) {
         obj[target[i]] = obj[target[i]] ? obj[target[i]] += 1 : 1
       }
 
       const result = []
-      let res= Object.entries(obj).sort((x,y)=>x[1]-y[1]);
+      let res = Object.entries(obj).sort((x, y) => x[1] - y[1]);
       res.forEach(item => {
         result.push(item[0])
       });
@@ -73,36 +98,40 @@
     // 4、 数组扁平化
     // [1,[2,3],[4,[5,6]],7]
     let res = [];
-    function myFlat(target){
-      target.forEach(item =>{
+
+    function myFlat(target) {
+      target.forEach(item => {
         // console.log(item instanceof Array)
-        if(Object.prototype.toString.call(item)!=="[object Array]"){
+        if (Object.prototype.toString.call(item) !== "[object Array]") {
           res.push(item)
-        }else{
+        } else {
           myFlat(item)
         }
-        
+
       })
       return res
     }
     // console.log(myFlat([1,[2,3],[4,[5,6]],7]))
 
     // 5、call,apply对于箭头函数问题
-    const a = (a,b,c)=>{
-      console.log(this.name,a,b,c)
+    const a = (a, b, c) => {
+      console.log(this.name, a, b, c)
     }
-    const bar = {name: 'bar'}
+    const bar = {
+      name: 'bar'
+    }
     // a.call(bar,1,2,3)
 
 
     // 6、事件循环
-    new Promise(resolve=>{
+    new Promise(resolve => {
       resolve(123)
       console.log(1)
-    }).then(res=>{
+    }).then(res => {
       console.log(2)
     })
     console.log(3)
   </script>
 </body>
+
 </html>

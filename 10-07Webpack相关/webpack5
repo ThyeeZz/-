@@ -26,7 +26,7 @@
 
 4、常用 plugin
   插件用于bundle文件优化、资源管理，环境变量注入等等
-  clean-webpack-plugin: 大抱歉自动清理dist 目录
+  clean-webpack-plugin: 打包自动清理dist 目录
   html-webpack-plugin: 自动生成html ，并将打包后的js文件插入进去
   mini-css-extract-plugin: 把css 提取成单独的文件，与style-loader互斥，不能同时使用
 
@@ -74,8 +74,8 @@
     1· 使用文件指纹进行版本控制和缓存
       当设置了http强缓存，比如有效期一天，如果不适用hash ，当这个文件变了，因为文件名没有变，所以客户端还是用的旧的缓存
       ·hash：构建的 hash，每次构建都会改变，不建议使用
-      ·chunkhash： 和webpack打包的chunk有关，不同的entry 回生成不用的chunkhash 值
-      ·contenthash：根据文件内容来定义hash ，问价内容不变则contenthash永远不变，推荐在css文件上使用
+      ·chunkhash： 和webpack打包的chunk有关，不同的entry 会生成不同的chunkhash 值
+      ·contenthash：根据文件内容来定义hash ，文件内容不变则contenthash永远不变，推荐在css文件上使用
 
       //js 文件的指纹设置， 设置 output 的 filename，使用 [chunkhash]
       module.exports = {
@@ -123,7 +123,7 @@
     4· DLL
       将第三方库和业务基础包单独打包成一个文件，只在第一次打，或者需要更新依赖的时候打，此后每次就可以只打
       自己的资源包，加快了构建速度
-      方法： 使用 DELLPlugin 进行分包， DllReferencePlugin 对 manifest.json 引用
+      方法： 使用 DLLPlugin 进行分包， DllReferencePlugin 对 manifest.json 引用
 
       · 分包需要单独的配置文件：
       // webpack.dll.js

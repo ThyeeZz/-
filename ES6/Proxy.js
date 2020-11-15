@@ -47,16 +47,16 @@
 
 // 写一个 通过负数下标 正常获取到对应数组的值
 
-// let testArr = ['a', 'b', 'c', 'd', 'e', 'f'];
+let testArr = ['a', 'b', 'c', 'd', 'e', 'f'];
 
-// let proxy = new Proxy(testArr, {
-//   get(target, propKey) {
-//     console.log(target.length)
-//     propKey = Number(propKey) > 0 && Number(propKey) || Number(propKey) + target.length;
-//     console.log(propKey)
-//     return target[propKey]
-//   }
-// })
+let proxy = new Proxy(testArr, {
+  get(target, propKey) {
+    console.log(target.length)
+    propKey = Number(propKey) > 0 && Number(propKey) || Number(propKey) + target.length;
+    console.log(propKey)
+    return target[propKey]
+  }
+})
 
 // let person = {name: '张三'}
 
@@ -72,24 +72,24 @@
 
 // a) GET
 // 2、利用Proxy 实现属性的链式操作
-// var pipe = function (value) {
+var pipe = function (value) {
 
-//   var funcStack = [];
+  var funcStack = [];
 
-//   let oproxy = new Proxy({}, {
-//     get(pipeObject, fnName) {
-//       console.log(fnName)
-//       if (fnName === 'get') {
+  let oproxy = new Proxy({}, {
+    get(pipeObject, fnName) {
+      console.log(fnName)
+      if (fnName === 'get') {
 
-//         return funcStack.reduce((val, fn) => fn(val), value)
-//       }
-//       funcStack.push(window[fnName])
-//       return oproxy
-//     }
-//   })
-//   console.log(funcStack)
-//   return oproxy
-// }
+        return funcStack.reduce((val, fn) => fn(val), value)
+      }
+      funcStack.push(window[fnName])
+      return oproxy
+    }
+  })
+  console.log(funcStack)
+  return oproxy
+}
 
 
 // var double = n => n * 2;

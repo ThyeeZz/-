@@ -212,3 +212,12 @@
 
     iii) 自定义hook
         相同的 Hook 逻辑可以包装在函数中多处引用
+
+17、Redux
+    1· 使用原因：变化和异步
+    2· 核心概念
+        a) Action：必须包含type 字段来表示将要执行的动作
+        b) Reducer：指定了应用状态的变化如何响应Actions 并发送到store的。
+        纯函数，接收旧的state和actions，返回新的state；
+        不要直接修改state，用Object.assign 创建副本
+        c) Store，createStore 创建

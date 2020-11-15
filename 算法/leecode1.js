@@ -1,26 +1,26 @@
-// var lengthOfLongestSubstring = function(s) {
-//   let maxLen = 0;
-//   let sArr = s.split('');
+var lengthOfLongestSubstring = function(s) {
+  let maxLen = 0;
+  let sArr = s.split('');
 
-//   function getLongestSubString(index){
-//     let tempArr = [];
-//     let subArr = sArr.slice(index)
-//     subArr.some(item=>{
-//       if(tempArr.includes(item)){
-//         return tempArr
-//       }else{
-//         tempArr.push(item)
-//       }
-//     })
-//     return tempArr
-//   }
-//   for(let i=0;i<sArr.length;i++){
-//     console.log(getLongestSubString(i))
-//     let len = getLongestSubString(i).length
-//     maxLen = len>maxLen?len:maxLen
-//   }
-//   return maxLen
-// };
+  function getLongestSubString(index){
+    let tempArr = [];
+    let subArr = sArr.slice(index)
+    subArr.some(item=>{
+      if(tempArr.includes(item)){
+        return tempArr
+      }else{
+        tempArr.push(item)
+      }
+    })
+    return tempArr
+  }
+  for(let i=0;i<sArr.length;i++){
+    console.log(getLongestSubString(i))
+    let len = getLongestSubString(i).length
+    maxLen = len>maxLen?len:maxLen
+  }
+  return maxLen
+};
 
 // var findMedianSortedArrays = function(nums1, nums2) {
 //   for(var j=0;j<nums1.length;j++){

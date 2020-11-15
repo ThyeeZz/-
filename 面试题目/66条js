@@ -6,7 +6,7 @@
   chrome: blink
 
 2、BFC 清除浮动
-  block force content 格式化上下文，内部样式不会影响外部：display： absolute；overflow：hidden；float引发
+  block format content 格式化上下文，内部样式不会影响外部：display： absolute；overflow：hidden；float引发
   清除浮动：&::after{
     content: '',
     clear: both
@@ -23,7 +23,7 @@
     a): 最终谁调用函数，函数中this就指向谁
     b): 构造函数中的this：
       一般指向实例，
-      但是遇到return 时：如果返回的是对象，指向返回的对象，否则指向函数的实例
+      但是遇到return 时：如果返回的是对象，指向返回的对象，否则指向构造出来的的实例
       function fn() {  
         this.user = '追梦子';  
         return function(){};
@@ -95,7 +95,7 @@
     宏任务(macro-task): 包括整体代码、setTimeout setInterval ajax dom操作等等
     微任务(micro-tast): Promise
     Promise: 在new Promise()中传入的回调回立即执行,但他的then方法属于微任务
-    process.nextTick: 放在任务栈最尾部,不属于宏任务,为任务,所以总是发生在所有异步任务之前
+    process.nextTick: 放在执行栈最尾部,不属于宏任务,为任务,所以总是发生在所有异步任务之前
     setImmediate: 放在任务栈的最底部,但是setTimeout 优先于setImmediate,但是有可能detImmediate先执行
 
     同步代码（宏任务） > process.nextTick > Promise（微任务）> setTimeout(fn)、setInterval(fn)（宏任务）> setImmediate（宏任务）> setTimeout(fn, time)、setInterval(fn, time)，其中time>0
@@ -133,11 +133,12 @@
     2xx：成功状态码：
       200：OK 处理成功并返回
       204：No Content 处理成功，无资源可返回
-      206：Patial Content 客户端进行了范围请求，已经护理并返回范围内的实体内容
+      206：Patial Content 客户端进行了范围请求，已经处理并返回范围内的实体内容
     3xx：重定向
       301：永久重定向，请求资源被分配到新的url，之后应该使用新的url
       302：临时重定向，本次请求需要访问新的url
       303：临时，本次请求需要访问新的url并使用EGT方法请求
+      304：未修改
     4xx：客户端错误
       400： badrequest，报文语法错误
       401：unauthorized：未经许可
@@ -145,7 +146,7 @@
       404：notfound 服务器上找不到请求资源
     5xx：服务端错误
       500：服务器执行时发生错误
-      503：服务器朝服在或者正在维护，无法处理
+      503：服务器超负载或者正在维护，无法处理
 
 11、浏览从输入网址到回车发生了什么
   输入网址-->解析为域名-->向该域名发送请求-->服务器处理请求，返回资源-->本地获取资源开始解析-->生成doom树，css树-->进行渲染
@@ -165,7 +166,7 @@
 
     ii、浏览器缓存：浏览器更具第一次请求资源时返回的响应头来决定是否缓存
       a)、强缓存：直接从缓存中读取，network：200，size：from disk/memory cache
-      b)、协商缓存：再强缓存失效后，向服务器发起请求，有服务器根据缓存表示决定是否需要缓存
+      b)、协商缓存：再强缓存失效后，向服务器发起请求，由服务器根据缓存标识决定是否需要缓存
         发起请求--》请求强缓存--》未过期--》返回该i缓存结果
                             --》过期--》携带标识想服务器发起请求
                --》请求强缓存失败，返回缓存标识--》携带该表示发起http请求--》服务器返回304，资源无更新--》获取该缓存的请求结果--》返回该i缓存结果
@@ -238,7 +239,7 @@
     new Foo().getName();
     new new Foo().getName();
 
-    a)、Foo.getName()：Foo的getName属性被覆盖了   2
+    a)、Foo.getName()：调用Foo的静态方法   2
     b)、getName()：实际为 window.getName();  4
     c)、Foo().getName()：Foo执行返回的this指向window，并且将window上的getName函数覆盖了； 1
     d)、new Foo.getName()：实际上是实例化 Foo.getName函数，此时Foo.getName 打印2   2
@@ -248,7 +249,7 @@
 19、auguments
   非严格模式，不包含剩余参宿，默认参数，解构赋值的，arguments与实参互为映射；否则不追踪参数的值；
 
-20、Object.prototype.hasOwnProperty()
+20、Object.prototype.hasOwnProperty(prop)
   返回布尔值，指示对象自身属性中是否有该指定属性
 
 21、跨域，JSONP,CORS、CSRF、XSS

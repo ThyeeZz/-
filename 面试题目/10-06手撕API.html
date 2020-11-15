@@ -89,6 +89,7 @@
       }
       return false
     }
+    console.log(_instanceof(foo, Foo))
     // function _instanceof(left, right) {
     //   let leftVal = Object.getPrototypeOf(left);
     //   const rightVal = right.prototype;
@@ -121,10 +122,10 @@
       }
       thisArg = thisArg || window;
       const caller = this;
-      let [index, len] = [0, caller.length];
+      let [index, len,res] = [0, caller.length,[]];
       while (index < len) {
         let value = caller[index];
-        caller[index] = callback.call(thisArg, value, index, caller);
+        res.push(callback.call(thisArg, value, index, caller));
         index++;
       }
     }
@@ -224,6 +225,68 @@
     window.onresize = throttle(function () {
       console.log('onresize')
     }, 1)
+
+    class EventEmmiter {
+      constructor() {
+        this.events = {}
+      }
+
+      $on(eventName, callback) {
+        const {
+          events
+        } = this;
+        if (events[eventName]) {
+          events[eventName].add(callback)
+        } else {
+          events[eventName] = new Set()
+          events[eventName].add(callback)
+        }
+        return this
+      }
+      $emit(eventName, ...args) {
+        const {
+          events
+        } = this;
+        if (events[eventName]) {
+          events[eventName].forEach(event => {
+            event.call(this, ...args)
+          })
+        } else {
+          throw new Error('no such a event')
+        }
+
+
+      }
+      $offOne(eventName) {
+        const {
+          events
+        } = this;
+        if (events[eventName]) {
+          delete events[eventName]
+        }
+      }
+      $offAll() {
+        this.events = new Map()
+      }
+    }
+
+    const eventEmitter = new EventEmmiter()
+    const fn1 = (a, b, c) => {
+      console.log('fn1', a, b, c)
+    }
+    const fn2 = (a, b, c) => {
+      console.log('fn2', a, b, c)
+    }
+    const fn3 = (a, b, c) => {
+      console.log('fn3', a, b, c)
+    }
+    eventEmitter.$on('test', fn1).$on('test2', fn2).$on('test3', fn3)
+
+    // eventEmitter.$offOne('test')
+    // eventEmitter.$offAll()
+    eventEmitter.$emit('test', 1, 2, 3)
+    eventEmitter.$emit('test2', 4, 5, 6)
+    eventEmitter.$emit('test3', 7, 8, 9)
   </script>
 </body>
 

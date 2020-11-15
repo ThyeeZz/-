@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字节笔试题</title>
+  <link rel="stylesheet" href="./index.css">
+
+  <script>
+    // function sleep(sleepTime) {
+    //   for (var start = new Date; new Date - start <= sleepTime;) {}
+    // }
+    // sleep(3000)
+    // // const delta = document.getElementsByClassName[0];
+    // // const op = document.createElement('p')
+    // // op.innerText = '子元素加载上去了';
+    // // delta.appendChild(op)
+    // console.log('js执行完了')
+  </script>
+  <link rel="stylesheet" href="./css2.css">
+
+</head>
+
+<body>
+  <script>
+
+  </script>
+  <div class="delta">
+
+  </div>
+  <div class="delta2">
+
+  </div>
+  <h4>hello,everyone.I am your father!</h4>
+  <h4>大家好，我是你们的爸爸</h4>
+
+
+  <script>
+    // 1、promise 的实现
+    class _Promise {
+      constructor(excute) {
+        this.status = 'pedding';
+        this.result = null;
+        this.reason = null;
+        this.successList = [];
+        this.rejectList = [];
+        let resolve = (value) => {
+          this.status = 'success';
+          this.result = value;
+          this.successList.forEach(item => item(value))
+        }
+        let reject = (error) => {
+          this.status = 'reject'
+          this.reson = error
+          this.rejectList.forEach(item => item(error))
+        }
+        try {
+          excute(resolve, reject)
+        } catch (err) {
+          reject(err)
+        }
+      }
+    }
+
+    _Promise.prototype.then = function (resolveCb, rejectCb) {
+      if (this.status === 'pedding') {
+        this.successList.push(resolveCb)
+        this.rejectList.push(rejectCb)
+      }
+      if (this.status === 'success') {
+        resolveCb(this.result)
+
+      } else if (this.status === 'reject') {
+        rejectCb(this.reson)
+      }
+      return this
+    }
+    _Promise.prototype.catch = function (rejectCb) {
+      if (this.status === 'pedding') {
+        this.rejectList.push(rejectCb)
+      }
+      if (this.status === 'reject') {
+        this.rejectList.forEach(item => item())
+      }
+      return this
+    }
+
+    _Promise.prototype.all = function () {
+
+    }
+    _Promise.prototype.race = function (arr) {
+      if (!arr instanceof Array) {
+        throw new Error('参数类型错误')
+      }
+    }
+
+
+    const p1 = new _Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('p1')
+      }, 1000)
+    })
+    const p2 = new _Promise(reject => {
+      setTimeout(() => {
+        reject('p2')
+      }, 500)
+    })
+
+    // 2、forEach map 
+    Array.prototype._forEach = function (callBack, thisArg) {
+      thisArg = thisArg || window;
+
+      const [caller, len] = [this, this.length];
+      let index = 0;
+      while (index < len) {
+        const value = caller[index];
+        callBack.call(thisArg, value, index, caller)
+        index++
+      }
+    }
+
+    let arr = [1, 4, 3, 2]
+    arr._forEach(item => {
+      console.log(item)
+    })
+
+    // 4、 实现并发函数，函数参数为 urls (请求列表数组)、max(最大并发数量) 、fn(回调)，请求都成功执行回调
+    class LimitConcurrent {
+      constructor(urls, max, cb) {
+        this.Max = max;
+        this.urls = urls
+      }
+
+      call() {
+        this.urls.forEach(url => {
+          return axios.get(url)
+        })
+      }
+    }
+
+    // 5 使用闭包实现每秒打印1,2,3,4
+    const log = (function () {
+      let timer = null;
+      return function () {
+        if (timer) {
+          clearInterval(timer)
+          timer = null
+        }
+        timer = setInterval(() => {
+          console.log(1, 2, 3, 4)
+        }, 1000)
+      }
+    }())
+
+    // 5、 js 的节流与防抖
+    function debounce(cb, delay) {
+      let timer = null;
+      return function () {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+        timer = setTimeout(cb, delay);
+      }
+    }
+
+    function throttle(cb, delay) {
+      delay = delay || 300
+      let last = 0;
+      return function () {
+        let now = +new Date();
+        if (now - last > delay) {
+          console.log(now, last)
+          cb()
+          last = now
+        }
+      }
+    }
+
+
+    // 6、Symbol Proxy 
+    const sy1 = Symbol('sy1')
+    const sy2 = Symbol('sy2')
+    const foo = {}
+    foo[sy1] = 'x';
+    foo[sy2] = 'z';
+    const proxy = new Proxy(foo, {
+      get(target, propKey, receiver) {
+        console.log('get')
+        return Reflect.get(target, propKey, receiver)
+      },
+      set(target, propKey, val, receiver) {
+        console.log('set')
+        return Reflect.set(target, propKey, val, receiver)
+      }
+    })
+
+    // 7、数组去重 扁平化
+    let arr1 = [1, 1, 3, 5, 3, 6, 1]
+
+    function unique(arr) {
+      return arr.reduce((pre, cur) => {
+        if (pre.includes(cur)) {
+          return pre
+        } else {
+          pre.push(cur);
+          return pre
+        }
+      }, [])
+    }
+
+    let arr2 = [1, [2, [3, 4]]]
+
+    function _flat(arr) {
+      return arr.reduce((pre, cur) => {
+        return cur instanceof Array ? pre.concat(_flat(cur)) : pre.concat(cur)
+      }, [])
+    }
+  </script>
+
+</body>
+
+</html>

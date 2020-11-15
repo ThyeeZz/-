@@ -161,16 +161,26 @@
 
 
     // 如何实现if(a===1&&a===2&&a===3)
-    
+
     let a = 1;
-    Object.defineProperty(windwo,'a',{
-      get(){
-        return a ++
+    Object.defineProperty(window, 'a', {
+      get() {
+        return a++
       }
     })
     if (a == 1 & a == 2 && a == 3) {
       console.log('success')
     }
+
+    const statusStr = new Map([
+      ['1','待付款'],
+       ['2','待发货'],
+       ['3','已发货'],
+       ['4','交易完成'],
+       ['5','交易关闭'],
+       ['default',''],
+    ])
+    console.log(statusStr)
   </script>
 </body>
 
